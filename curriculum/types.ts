@@ -1,5 +1,10 @@
 export type LessonStatus = "available" | "coming-soon";
 
+export type LessonProgressMeta = {
+  storageKey: string;
+  stepCount: number;
+};
+
 export type LessonMeta = {
   number: number;
   slug: string;
@@ -8,6 +13,7 @@ export type LessonMeta = {
   description: string;
   module: string;
   status: LessonStatus;
+  progress?: LessonProgressMeta;
 };
 
 export type LessonStepMeta = {
