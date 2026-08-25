@@ -4,6 +4,7 @@ import "../styles/lesson-shell.css";
 import "../styles/home.css";
 import "../curriculum/01-character-representation/styles.css";
 import "../curriculum/02-shared-character-table/styles.css";
+import "../curriculum/03-ascii/styles.css";
 
 const title = "LLM Zero — Learn LLMs from First Principles";
 const description =

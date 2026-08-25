@@ -7,6 +7,10 @@ import {
   SHARED_CHARACTER_TABLE_STEPS,
   SHARED_CHARACTER_TABLE_STORAGE_KEY,
 } from "./02-shared-character-table/config";
+import {
+  ASCII_STEPS,
+  ASCII_STORAGE_KEY,
+} from "./03-ascii/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -40,9 +44,13 @@ export const LESSONS: LessonMeta[] = [
     slug: "ascii",
     title: "ASCII",
     question: "How did early computers agree on the same characters?",
-    description: "Explore the shared character table that made text portable across early computer systems.",
+    description: "Discover ASCII as a published character-number standard, inspect its structure, and find the boundary of its 128 values.",
     module: "Text becomes data",
-    status: "coming-soon",
+    status: "available",
+    progress: {
+      storageKey: ASCII_STORAGE_KEY,
+      stepCount: ASCII_STEPS.length,
+    },
   },
   {
     number: 4,

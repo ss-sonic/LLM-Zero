@@ -19,10 +19,10 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
       <div className="next-lesson-card">
         <div>
           <small>One final scaling problem</small>
-          <h3>What if millions of computers need the same table?</h3>
-          <p>Instead of every pair negotiating privately, people can publish one rulebook for everyone to implement. That kind of shared rulebook is a <strong>standard</strong>.</p>
+          <h3>What if thousands of computers need the same table?</h3>
+          <p>Instead of every pair negotiating privately, publish one rulebook that every machine can implement.</p>
         </div>
-        <span className="locked-pill">🔒 Lesson 03 · ASCII</span>
+        <Link className="primary-button" href="/lessons/ascii">Start Lesson 03 →</Link>
       </div>
 
       <div className="l2-complete-actions">
