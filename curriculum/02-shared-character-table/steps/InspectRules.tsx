@@ -17,7 +17,7 @@ export function InspectRulesStep({
       <div className="screen-copy centered-copy compact-copy">
         <p className="eyebrow">Step 2 · Inspect the rules</p>
         <h2>Why did Computer 2 show B?</h2>
-        <p className="lead">Trace the evidence before choosing: <strong>12</strong> left Computer 1, and <strong>12</strong> arrived at Computer 2. Now compare what each private table says 12 means.</p>
+        <p className="lead">Trace the evidence before choosing: <strong>12</strong> left Computer 1, and <strong>12</strong> arrived at Computer 2. Now compare the two private tables.</p>
       </div>
 
       <div className="l2-table-compare">
@@ -40,7 +40,7 @@ export function InspectRulesStep({
       </div>
 
       <div className="l2-question-block">
-        <h3 className="l2-decision-question">Which explanation fits the evidence?</h3>
+        <p className="question-label">Choose the explanation that fits what you just inspected.</p>
         <div className="binary-choice-row">
           <button className={answer === "changed" ? "big-choice selected" : "big-choice"} onClick={() => onAnswer("changed")}>
             <b>The number changed</b><span>12 somehow became a different number while travelling.</span>
