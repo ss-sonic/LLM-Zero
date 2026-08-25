@@ -28,23 +28,15 @@ export function CourseMap() {
         const progressState = progressBySlug[lesson.slug] ?? "start";
         const content = (
           <>
-            <span className="lesson-number">{String(lesson.number).padStart(2, "0")}</span>
-            <div className="lesson-copy">
-              <h3>{lesson.title}</h3>
-              <p>{lesson.question}</p>
-            </div>
+            <span className="lesson-number">{lesson.displayNumber ?? String(lesson.number).padStart(2, "0")}</span>
+            <div className="lesson-copy"><h3>{lesson.title}</h3><p>{lesson.question}</p></div>
             <span className={`lesson-action ${progressState}`}>{lesson.status === "available" ? actionLabel(progressState) : "Locked"}</span>
           </>
         );
-
         return lesson.status === "available" ? (
-          <Link className={`lesson-row available ${progressState}`} href={`/lessons/${lesson.slug}`} key={lesson.slug}>
-            {content}
-          </Link>
+          <Link className={`lesson-row available ${progressState}`} href={`/lessons/${lesson.slug}`} key={lesson.slug}>{content}</Link>
         ) : (
-          <div className="lesson-row locked" key={lesson.slug} aria-disabled="true">
-            {content}
-          </div>
+          <div className="lesson-row locked" key={lesson.slug} aria-disabled="true">{content}</div>
         );
       })}
     </div>

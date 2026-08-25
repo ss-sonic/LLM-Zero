@@ -18,7 +18,7 @@ export type CodePointsVsBytesPersistedState = {
   agreementRecallCommitted: boolean;
   agreementRecallAssessment: RecallAssessment;
   encodingRevealed: boolean;
-  encodeAInputs: string[];
+  roundTripEncodeInputs: string[];
   decodeRocketInput: string;
   costTotalInput: string;
   costZeroInput: string;
