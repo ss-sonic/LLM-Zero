@@ -1,0 +1,80 @@
+import type { LessonMeta } from "./types";
+
+export const LESSONS: LessonMeta[] = [
+  {
+    number: 1,
+    slug: "character-representation",
+    title: "How computers represent text",
+    question: "How can the letter A exist inside a computer?",
+    description: "Build the bridge from a human-visible symbol to a number and then to bits.",
+    module: "Text becomes data",
+    status: "available",
+  },
+  {
+    number: 2,
+    slug: "shared-character-table",
+    title: "Why computers need a shared character table",
+    question: "What if every computer invents its own table?",
+    description: "Experience why communication breaks when two machines disagree about what a number means.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+  {
+    number: 3,
+    slug: "ascii",
+    title: "ASCII",
+    question: "How did early computers agree on the same characters?",
+    description: "Explore the shared character table that made text portable across early computer systems.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+  {
+    number: 4,
+    slug: "breaking-ascii",
+    title: "Break ASCII",
+    question: "What happens when the world needs more than English characters?",
+    description: "Try real text that ASCII cannot represent and discover the limitation yourself.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+  {
+    number: 5,
+    slug: "unicode",
+    title: "Unicode and code points",
+    question: "How can one system name characters from the whole world?",
+    description: "Separate the idea of a character from its stable numeric code point.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+  {
+    number: 6,
+    slug: "code-points-vs-bytes",
+    title: "A code point is not a byte",
+    question: "If Unicode gives a character a number, what actually gets stored?",
+    description: "Separate character identity, code points, encodings, bytes, and bits.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+  {
+    number: 7,
+    slug: "utf-8",
+    title: "Build UTF-8 by hand",
+    question: "How does a Unicode code point become real bytes?",
+    description: "Construct UTF-8 byte sequences and inspect their bits directly.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+  {
+    number: 8,
+    slug: "utf-encodings",
+    title: "UTF-8 vs UTF-16 vs UTF-32",
+    question: "Why is there more than one way to encode Unicode?",
+    description: "Compare storage, compatibility, and design tradeoffs between common Unicode encodings.",
+    module: "Text becomes data",
+    status: "coming-soon",
+  },
+];
+
+export function getLessonMeta(slug: string) {
+  return LESSONS.find((lesson) => lesson.slug === slug);
+}
