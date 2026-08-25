@@ -10,6 +10,7 @@ import "../curriculum/05-unicode-code-points/styles.css";
 import "../curriculum/06-code-points-vs-bytes/styles.css";
 import "../curriculum/06-code-points-vs-bytes/completion.css";
 import "../curriculum/06a-hexadecimal/styles.css";
+import "../curriculum/07-utf8/styles.css";
 import "../styles/lesson-typography.css";
 
 const title = "LLM Zero — Learn LLMs from First Principles";

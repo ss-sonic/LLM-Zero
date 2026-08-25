@@ -20,7 +20,7 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
       </div>
       <div className="next-lesson-card">
         <div><small>Next mystery</small><h3>How could 🚀 at U+1F680 become bytes like F0 9F 9A 80?</h3><p>Lesson 06 showed why we need an encoding. Now we have the notation needed to inspect a real variable-length encoding bit by bit.</p></div>
-        <span className="locked-pill">🔒 Lesson 07 · Build UTF-8 by hand</span>
+        <Link className="primary-button" href="/lessons/utf-8">Start Lesson 07 →</Link>
       </div>
       <div className="hx-complete-actions"><Link href="/" className="primary-button">Back to course map</Link><button className="text-link-button" onClick={onRestart}>Replay this bridge</button></div>
     </div>
