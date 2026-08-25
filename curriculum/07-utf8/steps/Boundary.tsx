@@ -40,14 +40,12 @@ export function BoundaryStep({ seen, onInspect, onContinue }: { seen: string[]; 
           return (
             <button
               key={item.id}
-              className={`${selected ? "active" : ""}${explored ? " explored" : ""}`.trim()}
+              className={selected ? "seen" : ""}
               aria-pressed={selected}
               onClick={() => choose(item.id)}
             >
-              <span className="u8-grouping-values">
-                {item.groups.map((group) => <code key={group}>[{group}]</code>)}
-              </span>
-              {explored && !selected ? <small>✓ explored</small> : selected ? <small>current interpretation</small> : null}
+              {item.groups.map((group) => <code key={group}>[{group}]</code>)}
+              {explored && !selected ? <small>✓ tried</small> : selected ? <small>current interpretation</small> : null}
             </button>
           );
         })}
