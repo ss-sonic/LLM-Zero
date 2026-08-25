@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const STEP_LABELS = [
   "The mystery",
@@ -13,8 +13,25 @@ const STEP_LABELS = [
 ];
 
 const PLACE_VALUES = [128, 64, 32, 16, 8, 4, 2, 1];
+const STORAGE_KEY = "llm-zero:lesson-01:v1";
 
 type BitPhase = "build" | "explain" | "play";
+type ConventionAnswer = "yes" | "no" | null;
+type FinalAnswer = "letter" | "representation" | null;
+
+type PersistedLessonState = {
+  currentStep: number;
+  highestUnlocked: number;
+  introGuess: string | null;
+  numberDraft: string;
+  agreedNumber: number;
+  conventionAnswer: ConventionAnswer;
+  sendRevealed: boolean;
+  labBits: string[];
+  bitPhase: BitPhase;
+  hasFlippedBit: boolean;
+  finalAnswer: FinalAnswer;
+};
 
 function toBits(value: number) {
   return value.toString(2).padStart(8, "0").slice(-8).split("");
@@ -28,18 +45,61 @@ function emptyBits() {
   return Array(8).fill("0") as string[];
 }
 
+function isBitArray(value: unknown): value is string[] {
+  return Array.isArray(value)
+    && value.length === 8
+    && value.every((bit) => bit === "0" || bit === "1");
+}
+
+function clampStep(value: number, highestUnlocked: number) {
+  return Math.min(
+    Math.max(Math.round(value), 0),
+    Math.max(0, Math.min(highestUnlocked, STEP_LABELS.length - 1)),
+  );
+}
+
+function readStepFromUrl() {
+  const raw = new URL(window.location.href).searchParams.get("step");
+  if (raw === null) return null;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed)) return null;
+  return parsed - 1;
+}
+
+function writeStepToUrl(step: number, mode: "push" | "replace") {
+  const url = new URL(window.location.href);
+  url.searchParams.set("step", String(step + 1));
+  if (mode === "push") {
+    window.history.pushState({ lessonStep: step }, "", url);
+  } else {
+    window.history.replaceState({ lessonStep: step }, "", url);
+  }
+}
+
+function readSavedState(): Partial<PersistedLessonState> | null {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Home() {
+  const [hasHydrated, setHasHydrated] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [highestUnlocked, setHighestUnlocked] = useState(0);
   const [introGuess, setIntroGuess] = useState<string | null>(null);
   const [numberDraft, setNumberDraft] = useState("65");
   const [agreedNumber, setAgreedNumber] = useState(65);
-  const [conventionAnswer, setConventionAnswer] = useState<"yes" | "no" | null>(null);
+  const [conventionAnswer, setConventionAnswer] = useState<ConventionAnswer>(null);
   const [sendRevealed, setSendRevealed] = useState(false);
   const [labBits, setLabBits] = useState<string[]>(() => emptyBits());
   const [bitPhase, setBitPhase] = useState<BitPhase>("build");
   const [hasFlippedBit, setHasFlippedBit] = useState(false);
-  const [finalAnswer, setFinalAnswer] = useState<"letter" | "representation" | null>(null);
+  const [finalAnswer, setFinalAnswer] = useState<FinalAnswer>(null);
 
   const labNumber = useMemo(() => bitsToNumber(labBits), [labBits]);
   const receiverSymbol = "G";
@@ -49,17 +109,107 @@ export default function Home() {
     [targetBits],
   );
 
+  useEffect(() => {
+    const saved = readSavedState();
+    const restoredHighest = clampStep(
+      typeof saved?.highestUnlocked === "number" ? saved.highestUnlocked : 0,
+      STEP_LABELS.length - 1,
+    );
+    const restoredAgreedNumber = Math.max(
+      0,
+      Math.min(255, Math.round(typeof saved?.agreedNumber === "number" ? saved.agreedNumber : 65)),
+    );
+    const requestedStep = readStepFromUrl();
+    const restoredCurrent = clampStep(
+      requestedStep ?? (typeof saved?.currentStep === "number" ? saved.currentStep : 0),
+      restoredHighest,
+    );
+
+    setHighestUnlocked(restoredHighest);
+    setCurrentStep(restoredCurrent);
+    setIntroGuess(typeof saved?.introGuess === "string" ? saved.introGuess : null);
+    setNumberDraft(typeof saved?.numberDraft === "string" ? saved.numberDraft : String(restoredAgreedNumber));
+    setAgreedNumber(restoredAgreedNumber);
+    setConventionAnswer(saved?.conventionAnswer === "yes" || saved?.conventionAnswer === "no" ? saved.conventionAnswer : null);
+    setSendRevealed(saved?.sendRevealed === true);
+    setLabBits(isBitArray(saved?.labBits) ? saved.labBits : emptyBits());
+    setBitPhase(saved?.bitPhase === "explain" || saved?.bitPhase === "play" ? saved.bitPhase : "build");
+    setHasFlippedBit(saved?.hasFlippedBit === true);
+    setFinalAnswer(
+      saved?.finalAnswer === "letter" || saved?.finalAnswer === "representation"
+        ? saved.finalAnswer
+        : null,
+    );
+    writeStepToUrl(restoredCurrent, "replace");
+    setHasHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    const state: PersistedLessonState = {
+      currentStep,
+      highestUnlocked,
+      introGuess,
+      numberDraft,
+      agreedNumber,
+      conventionAnswer,
+      sendRevealed,
+      labBits,
+      bitPhase,
+      hasFlippedBit,
+      finalAnswer,
+    };
+
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // The lesson remains usable in privacy modes where local storage is unavailable.
+    }
+  }, [
+    hasHydrated,
+    currentStep,
+    highestUnlocked,
+    introGuess,
+    numberDraft,
+    agreedNumber,
+    conventionAnswer,
+    sendRevealed,
+    labBits,
+    bitPhase,
+    hasFlippedBit,
+    finalAnswer,
+  ]);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    function handlePopState() {
+      const requested = readStepFromUrl();
+      if (requested === null) return;
+      const safeStep = clampStep(requested, highestUnlocked);
+      setCurrentStep(safeStep);
+      if (safeStep !== requested) writeStepToUrl(safeStep, "replace");
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [hasHydrated, highestUnlocked]);
+
   function unlock(step: number) {
     setHighestUnlocked((current) => Math.max(current, step));
   }
 
   function goTo(step: number) {
-    if (step <= highestUnlocked) setCurrentStep(step);
+    if (step > highestUnlocked || step < 0) return;
+    setCurrentStep(step);
+    if (hasHydrated) writeStepToUrl(step, "push");
   }
 
   function unlockAndGo(step: number) {
     unlock(step);
     setCurrentStep(step);
+    if (hasHydrated) writeStepToUrl(step, "push");
   }
 
   function commitNumber() {
@@ -113,10 +263,20 @@ export default function Home() {
     setBitPhase("build");
     setHasFlippedBit(false);
     setFinalAnswer(null);
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // The in-memory reset still succeeds if storage is unavailable.
+    }
+    if (hasHydrated) writeStepToUrl(0, "replace");
   }
 
   const buildDifference = agreedNumber - labNumber;
   const buildSolved = labNumber === agreedNumber;
+
+  if (!hasHydrated) {
+    return <main className="app-shell" aria-busy="true" />;
+  }
 
   return (
     <main className="app-shell">
@@ -570,7 +730,7 @@ export default function Home() {
       </section>
 
       <div className="stage-footer" aria-label="Lesson navigation">
-        <button className="back-button" onClick={() => setCurrentStep((step) => Math.max(0, step - 1))} disabled={currentStep === 0}>← Back</button>
+        <button className="back-button" onClick={() => goTo(Math.max(0, currentStep - 1))} disabled={currentStep === 0}>← Back</button>
         <span>{currentStep + 1} / {STEP_LABELS.length}</span>
         <span className="footer-hint">Complete this screen to unlock the next one.</span>
       </div>
