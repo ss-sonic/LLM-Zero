@@ -39,53 +39,55 @@ export function ForcedSequenceStep({
           >
             <strong>Fixed-{width}</strong>
             <span>{width} bytes per character</span>
-            <small>{widthsSeen.includes(width) ? "✓ run" : "run this rule"}</small>
+            <small>{widthsSeen.includes(width) ? "✓ inspected" : "Inspect rule →"}</small>
           </button>
         ))}
       </div>
 
-      <div className="l6-width-results card">
-        <small>Results you have produced</small>
-        {widthsSeen.length === 0 ? (
-          <p className="l6-hint">Run all three rules to compare them.</p>
-        ) : (
-          <table className="l6-width-table">
-            <thead>
-              <tr>
-                <th scope="col">Rule</th>
-                <th scope="col">Reaches up to</th>
-                <th scope="col">{LATIN_A.symbol} ({LATIN_A.codePoint})</th>
-                <th scope="col">{ROCKET.symbol} ({ROCKET.codePoint.toLocaleString("en-US")})</th>
-              </tr>
-            </thead>
-            <tbody>
-              {WIDTH_OPTIONS.filter((width) => widthsSeen.includes(width)).map((width) => {
-                const forA = encodeFixed(LATIN_A.codePoint, width);
-                const forRocket = encodeFixed(ROCKET.codePoint, width);
-                return (
-                  <tr key={width}>
-                    <th scope="row">Fixed-{width}</th>
-                    <td>{maxValueForWidth(width).toLocaleString("en-US")}</td>
-                    <td><code>{forA ? `[${forA.join(", ")}]` : "—"}</code></td>
-                    <td>
-                      {forRocket
-                        ? <code>[{forRocket.join(", ")}]</code>
-                        : <em className="l6-cannot">cannot represent it</em>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+      {widthsSeen.length === 0 ? (
+        <p className="l6-hint">Inspect all three rules. Their results will appear here.</p>
+      ) : (
+        <div className="l6-width-results">
+          {WIDTH_OPTIONS.filter((width) => widthsSeen.includes(width)).map((width) => {
+            const forA = encodeFixed(LATIN_A.codePoint, width);
+            const forRocket = encodeFixed(ROCKET.codePoint, width);
+            return (
+              <article className="l6-width-result-card card" key={width}>
+                <div className="l6-width-result-head">
+                  <div>
+                    <small>Rule</small>
+                    <strong>Fixed-{width}</strong>
+                  </div>
+                  <div>
+                    <small>Largest value</small>
+                    <b>{maxValueForWidth(width).toLocaleString("en-US")}</b>
+                  </div>
+                </div>
 
-        {widthsSeen.includes(2) ? (
-          <p className="l6-note">
-            Fixed-2 stops at {maxValueForWidth(2).toLocaleString("en-US")}. It handles {LATIN_A.symbol} perfectly well and simply has no room for {ROCKET.symbol} at all —
-            a rule can be a real rule and still fail to cover the whole repertoire.
-          </p>
-        ) : null}
-      </div>
+                <div className="l6-width-examples">
+                  <div>
+                    <span>{LATIN_A.symbol} · {LATIN_A.codePoint}</span>
+                    <code>{forA ? `[${forA.join(", ")}]` : "—"}</code>
+                  </div>
+                  <div className={!forRocket ? "cannot" : ""}>
+                    <span>{ROCKET.symbol} · {ROCKET.codePoint.toLocaleString("en-US")}</span>
+                    {forRocket
+                      ? <code>[{forRocket.join(", ")}]</code>
+                      : <b>no room for this value</b>}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {widthsSeen.includes(2) ? (
+        <p className="l6-note l6-width-note">
+          Fixed-2 stops at {maxValueForWidth(2).toLocaleString("en-US")}. It handles {LATIN_A.symbol} perfectly well and simply has no room for {ROCKET.symbol} —
+          a rule can be valid and still fail to cover the whole repertoire.
+        </p>
+      ) : null}
 
       {allInspected ? (
         <div className="l6-question-block">
