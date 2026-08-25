@@ -6,7 +6,7 @@ LLM Zero grows from the smallest representation concepts toward complete languag
 
 - [x] Lesson 01 — How can the letter A exist inside a computer?
 - [x] Lesson 02 — Why do computers need a shared character table?
-- [ ] Lesson 03 — ASCII: one early shared agreement
+- [x] Lesson 03 — ASCII: one early shared agreement
 - [ ] Lesson 04 — Break ASCII with the world's languages
 - [ ] Lesson 05 — Unicode and code points
 - [ ] Lesson 06 — A code point is not a byte
