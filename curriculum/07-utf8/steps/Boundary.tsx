@@ -44,7 +44,7 @@ export function BoundaryStep({ seen, onInspect, onContinue }: { seen: string[]; 
               aria-pressed={selected}
               onClick={() => choose(item.id)}
             >
-              {item.groups.map((group) => <code key={group}>[{group}]</code>)}
+              {item.groups.map((group, index) => <code key={`${item.id}-group-${index}`}>[{group}]</code>)}
               {explored && !selected ? <small>✓ tried</small> : selected ? <small>current interpretation</small> : null}
             </button>
           );
