@@ -116,7 +116,11 @@ export function HexadecimalBridge() {
   }
 
   function toggleNibble(index: number) {
-    setNibbleBits((current) => current.map((bit, bitIndex) => bitIndex === index ? (bit === "1" ? "0" : "1") : bit));
+    setNibbleBits((current) => {
+      const next = current.map((bit, bitIndex) => bitIndex === index ? (bit === "1" ? "0" : "1") : bit);
+      if (next.every((bit) => bit === "1") && Number(patternCount) === 16) unlock(2);
+      return next;
+    });
   }
 
   function updatePatternCount(value: string) {
