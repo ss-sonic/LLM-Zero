@@ -56,11 +56,13 @@
 }
 .lesson-row.available { border-color: var(--ink); }
 .lesson-row.available:hover { box-shadow: 0 8px 30px rgba(20,20,20,.06); }
+.lesson-row.available.completed { border-color: #b7cfb7; background: #fbfff9; }
 .lesson-number { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); font-size: 13px; }
 .lesson-copy h3 { margin: 0 0 5px; font-size: 21px; letter-spacing: -.025em; }
 .lesson-copy p { margin: 0; color: var(--muted); line-height: 1.45; }
 .lesson-action { white-space: nowrap; border-radius: 999px; padding: 9px 12px; font-size: 12px; font-weight: 800; }
 .lesson-row.available .lesson-action { background: var(--ink); color: white; }
+.lesson-row.available .lesson-action.completed { background: var(--green); color: #274327; border: 1px solid #b7cfb7; }
 .lesson-row.locked { opacity: .62; }
 .lesson-row.locked .lesson-action { border: 1px solid var(--line); }
 
