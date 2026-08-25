@@ -15,7 +15,7 @@ The roadmap tracks two things in parallel:
 - [x] Lesson 04 — Break ASCII with the world's languages
 - [x] Lesson 05 — Unicode and code points
 - [x] Lesson 06 — A code point is not a byte
-- [ ] Foundation bridge — Hexadecimal as compact binary notation (`0000–1111 ↔ 0–F`)
+- [x] Foundation bridge — Hexadecimal as compact binary notation (`0000–1111 ↔ 0–F`)
 - [ ] Lesson 07 — Build UTF-8 by hand
 - [ ] Lesson 08 — UTF-8 vs UTF-16 vs UTF-32
 - [ ] Challenge — Trace a multilingual sentence from symbols to bytes

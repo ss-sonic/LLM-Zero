@@ -7,6 +7,7 @@ export type LessonProgressMeta = {
 
 export type LessonMeta = {
   number: number;
+  displayNumber?: string;
   slug: string;
   title: string;
   question: string;
