@@ -12,12 +12,20 @@ const STEP_LABELS = [
   "Complete",
 ];
 
+const PLACE_VALUES = [128, 64, 32, 16, 8, 4, 2, 1];
+
+type BitPhase = "build" | "explain" | "play";
+
 function toBits(value: number) {
   return value.toString(2).padStart(8, "0").slice(-8).split("");
 }
 
 function bitsToNumber(bits: string[]) {
   return parseInt(bits.join(""), 2);
+}
+
+function emptyBits() {
+  return Array(8).fill("0") as string[];
 }
 
 export default function Home() {
@@ -28,12 +36,18 @@ export default function Home() {
   const [agreedNumber, setAgreedNumber] = useState(65);
   const [conventionAnswer, setConventionAnswer] = useState<"yes" | "no" | null>(null);
   const [sendRevealed, setSendRevealed] = useState(false);
-  const [labBits, setLabBits] = useState(() => toBits(65));
+  const [labBits, setLabBits] = useState<string[]>(() => emptyBits());
+  const [bitPhase, setBitPhase] = useState<BitPhase>("build");
   const [hasFlippedBit, setHasFlippedBit] = useState(false);
   const [finalAnswer, setFinalAnswer] = useState<"letter" | "representation" | null>(null);
 
   const labNumber = useMemo(() => bitsToNumber(labBits), [labBits]);
   const receiverSymbol = "G";
+  const targetBits = useMemo(() => toBits(agreedNumber), [agreedNumber]);
+  const activePlaceValues = useMemo(
+    () => PLACE_VALUES.filter((_, index) => targetBits[index] === "1"),
+    [targetBits],
+  );
 
   function unlock(step: number) {
     setHighestUnlocked((current) => Math.max(current, step));
@@ -54,11 +68,29 @@ export default function Home() {
     const safe = Math.max(0, Math.min(255, Math.round(parsed)));
     setAgreedNumber(safe);
     setNumberDraft(String(safe));
-    setLabBits(toBits(safe));
+    setLabBits(emptyBits());
+    setBitPhase("build");
     setHasFlippedBit(false);
     setSendRevealed(false);
     setConventionAnswer(null);
     unlockAndGo(2);
+  }
+
+  function toggleBuildBit(index: number) {
+    setLabBits((current) => current.map((bit, bitIndex) => (
+      bitIndex === index ? (bit === "0" ? "1" : "0") : bit
+    )));
+  }
+
+  function startExplanation() {
+    setLabBits(targetBits);
+    setBitPhase("explain");
+  }
+
+  function startFreePlay() {
+    setLabBits(targetBits);
+    setBitPhase("play");
+    setHasFlippedBit(false);
   }
 
   function flipBit(index: number) {
@@ -77,10 +109,14 @@ export default function Home() {
     setAgreedNumber(65);
     setConventionAnswer(null);
     setSendRevealed(false);
-    setLabBits(toBits(65));
+    setLabBits(emptyBits());
+    setBitPhase("build");
     setHasFlippedBit(false);
     setFinalAnswer(null);
   }
+
+  const buildDifference = agreedNumber - labNumber;
+  const buildSolved = labNumber === agreedNumber;
 
   return (
     <main className="app-shell">
@@ -295,45 +331,171 @@ export default function Home() {
             <div className="screen-layout centered-screen wide-screen bit-screen">
               <div className="screen-copy centered-copy compact-copy">
                 <p className="eyebrow">Step 5 · Look underneath the number</p>
-                <h2>{agreedNumber} can be written using only 0 and 1.</h2>
-                <p className="lead">Here we use eight positions — one byte. Each position has a value. Click any bit once and watch the number change.</p>
+                {bitPhase === "build" && (
+                  <>
+                    <h2>Can you build {agreedNumber} using these eight switches?</h2>
+                    <p className="lead">Each switch has a fixed value. ON means “include this value.” OFF means “do not include it.” Make the total equal {agreedNumber}.</p>
+                  </>
+                )}
+                {bitPhase === "explain" && (
+                  <>
+                    <h2>Why is {agreedNumber} exactly <span className="binary-heading">{targetBits.join("")}</span>?</h2>
+                    <p className="lead">Because binary is positional math. The pattern tells us exactly which fixed place values to add.</p>
+                  </>
+                )}
+                {bitPhase === "play" && (
+                  <>
+                    <h2>Now break it on purpose.</h2>
+                    <p className="lead">Change any one bit. Because each position has a fixed value, the stored number must change too.</p>
+                  </>
+                )}
               </div>
 
               <div className="bit-lab card dark-card">
-                <div className="bit-values" aria-hidden="true">
-                  {[128, 64, 32, 16, 8, 4, 2, 1].map((value) => <span key={value}>{value}</span>)}
-                </div>
-                <div className="bits" aria-label={`Binary value ${labBits.join("")}`}>
-                  {labBits.map((bit, index) => (
-                    <button
-                      key={index}
-                      onClick={() => flipBit(index)}
-                      className={bit === "1" ? "bit on" : "bit"}
-                      aria-label={`Bit worth ${2 ** (7 - index)}, currently ${bit}`}
-                    >
-                      {bit}
-                    </button>
-                  ))}
-                </div>
-                <div className="equation">
-                  <span>{labBits.join("")}</span>
-                  <b>=</b>
-                  <strong>{labNumber}</strong>
-                </div>
-                {!hasFlippedBit && <p className="lab-hint">Flip any one bit.</p>}
-                {hasFlippedBit && (
-                  <div className="bit-discovery">
-                    <p>One tiny 0/1 change changed the number from <b>{agreedNumber}</b> to <b>{labNumber}</b>.</p>
-                    <button
-                      className="primary-button light-button"
-                      onClick={() => {
-                        setLabBits(toBits(agreedNumber));
-                        unlockAndGo(5);
-                      }}
-                    >
-                      Put the original bits back →
-                    </button>
+                {bitPhase === "build" && (
+                  <>
+                    <div className="target-meter">
+                      <div><small>Target</small><strong>{agreedNumber}</strong></div>
+                      <span>→</span>
+                      <div><small>Your total</small><strong className={buildSolved ? "solved-total" : ""}>{labNumber}</strong></div>
+                    </div>
+
+                    <div className="bit-values place-value-labels" aria-hidden="true">
+                      {PLACE_VALUES.map((value) => <span key={value}>+{value}</span>)}
+                    </div>
+                    <div className="bits" aria-label={`Your binary value ${labBits.join("")}, total ${labNumber}`}>
+                      {labBits.map((bit, index) => (
+                        <button
+                          key={index}
+                          onClick={() => toggleBuildBit(index)}
+                          className={bit === "1" ? "bit on" : "bit"}
+                          aria-label={`${bit === "1" ? "Remove" : "Add"} ${PLACE_VALUES[index]}, currently ${bit}`}
+                        >
+                          {bit}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="build-equation" aria-live="polite">
+                      <span>{labBits.join("")}</span>
+                      <b>=</b>
+                      <strong>{labNumber}</strong>
+                    </div>
+
+                    {!buildSolved && (
+                      <p className={buildDifference > 0 ? "build-hint" : "build-hint over"}>
+                        {buildDifference > 0
+                          ? `You still need ${buildDifference} more.`
+                          : `You went ${Math.abs(buildDifference)} too high. Turn something off.`}
+                      </p>
+                    )}
+
+                    {buildSolved && (
+                      <div className="bit-discovery build-success">
+                        <p><b>You built {agreedNumber}.</b> Now let&apos;s unpack why this exact pattern works.</p>
+                        <button className="primary-button light-button" onClick={startExplanation}>Show the calculation →</button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {bitPhase === "explain" && (
+                  <div className="binary-explanation">
+                    <div className="calculation-grid" aria-label={`Binary calculation for ${agreedNumber}`}>
+                      {PLACE_VALUES.map((value, index) => (
+                        <div className={targetBits[index] === "1" ? "calc-column active" : "calc-column"} key={value}>
+                          <small>place</small>
+                          <b>{value}</b>
+                          <span>×</span>
+                          <strong>{targetBits[index]}</strong>
+                          <em>= {targetBits[index] === "1" ? value : 0}</em>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="sum-panel">
+                      <small>Add only the places whose bit is 1</small>
+                      <div className="sum-line">
+                        <span>{activePlaceValues.length ? activePlaceValues.join(" + ") : "0"}</span>
+                        <b>=</b>
+                        <strong>{agreedNumber}</strong>
+                      </div>
+                      <code>{targetBits.join("")}</code>
+                    </div>
+
+                    <details className="place-values-explainer">
+                      <summary>Why are the places 128, 64, 32, 16, 8, 4, 2, 1?</summary>
+                      <div className="place-values-body">
+                        <p>It is the same positional idea you already use in decimal.</p>
+                        <div className="base-comparison">
+                          <div>
+                            <small>Decimal · powers of 10</small>
+                            <code>1000 · 100 · 10 · 1</code>
+                          </div>
+                          <div>
+                            <small>Binary · powers of 2</small>
+                            <code>128 · 64 · 32 · 16 · 8 · 4 · 2 · 1</code>
+                          </div>
+                        </div>
+                        <p>Binary has only two digits: 0 means “leave this place out” and 1 means “include this place.” With fixed powers-of-two places, each whole number from 0 to 255 has one 8-bit pattern.</p>
+                      </div>
+                    </details>
+
+                    <div className="rule-contrast">
+                      <div>
+                        <small>Human convention</small>
+                        <b>A → {agreedNumber}</b>
+                        <span>We were free to choose this.</span>
+                      </div>
+                      <div>
+                        <small>Positional math</small>
+                        <b>{agreedNumber} → {targetBits.join("")}</b>
+                        <span>Once binary&apos;s place values are fixed, this is determined.</span>
+                      </div>
+                    </div>
+
+                    <button className="primary-button light-button explanation-next" onClick={startFreePlay}>I get it — let me change a bit →</button>
                   </div>
+                )}
+
+                {bitPhase === "play" && (
+                  <>
+                    <div className="bit-values" aria-hidden="true">
+                      {PLACE_VALUES.map((value) => <span key={value}>{value}</span>)}
+                    </div>
+                    <div className="bits" aria-label={`Binary value ${labBits.join("")}`}>
+                      {labBits.map((bit, index) => (
+                        <button
+                          key={index}
+                          onClick={() => flipBit(index)}
+                          className={bit === "1" ? "bit on" : "bit"}
+                          aria-label={`Bit worth ${PLACE_VALUES[index]}, currently ${bit}`}
+                        >
+                          {bit}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="equation">
+                      <span>{labBits.join("")}</span>
+                      <b>=</b>
+                      <strong>{labNumber}</strong>
+                    </div>
+                    {!hasFlippedBit && <p className="lab-hint">Flip any one bit and watch the total.</p>}
+                    {hasFlippedBit && (
+                      <div className="bit-discovery">
+                        <p>Changing one position changed the value from <b>{agreedNumber}</b> to <b>{labNumber}</b>. The positions carry the math.</p>
+                        <button
+                          className="primary-button light-button"
+                          onClick={() => {
+                            setLabBits(targetBits);
+                            unlockAndGo(5);
+                          }}
+                        >
+                          Continue →
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -389,7 +551,7 @@ export default function Home() {
                 <span>→</span>
                 <div><small>We agree on</small><b>{agreedNumber}</b></div>
                 <span>→</span>
-                <div><small>Computer stores</small><b className="binary-small">{toBits(agreedNumber).join("")}</b></div>
+                <div><small>Computer stores</small><b className="binary-small">{targetBits.join("")}</b></div>
               </div>
 
               <div className="next-lesson-card">
