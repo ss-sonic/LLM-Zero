@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { LESSONS } from "../curriculum/registry";
+import { CourseMap } from "../components/course/CourseMap";
 
 export default function HomePage() {
   return (
@@ -31,30 +30,7 @@ export default function HomePage() {
             <p>Before an AI model can process language, a computer needs a precise way to represent text at all.</p>
           </div>
 
-          <div className="lesson-list">
-            {LESSONS.map((lesson) => {
-              const content = (
-                <>
-                  <span className="lesson-number">{String(lesson.number).padStart(2, "0")}</span>
-                  <div className="lesson-copy">
-                    <h3>{lesson.title}</h3>
-                    <p>{lesson.question}</p>
-                  </div>
-                  <span className="lesson-action">{lesson.status === "available" ? "Start →" : "Locked"}</span>
-                </>
-              );
-
-              return lesson.status === "available" ? (
-                <Link className="lesson-row available" href={`/lessons/${lesson.slug}`} key={lesson.slug}>
-                  {content}
-                </Link>
-              ) : (
-                <div className="lesson-row locked" key={lesson.slug} aria-disabled="true">
-                  {content}
-                </div>
-              );
-            })}
-          </div>
+          <CourseMap />
         </section>
 
         <section className="home-principles" aria-label="How LLM Zero teaches">
