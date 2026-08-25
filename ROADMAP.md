@@ -8,7 +8,7 @@ LLM Zero grows from the smallest representation concepts toward complete languag
 - [x] Lesson 02 — Why do computers need a shared character table?
 - [x] Lesson 03 — ASCII: one early shared agreement
 - [x] Lesson 04 — Break ASCII with the world's languages
-- [ ] Lesson 05 — Unicode and code points
+- [x] Lesson 05 — Unicode and code points
 - [ ] Lesson 06 — A code point is not a byte
 - [ ] Lesson 07 — Build UTF-8 by hand
 - [ ] Lesson 08 — UTF-8 vs UTF-16 vs UTF-32

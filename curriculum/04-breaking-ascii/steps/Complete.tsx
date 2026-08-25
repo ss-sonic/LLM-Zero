@@ -24,7 +24,7 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
           <h3>How can one system give characters from across the world stable numeric identities?</h3>
           <p>We now know the table must grow dramatically. Next we can discover how a global character system names those characters without confusing their identity with how they are stored.</p>
         </div>
-        <span className="locked-pill">🔒 Lesson 05 · Unicode and code points</span>
+        <Link className="primary-button" href="/lessons/unicode">Start Lesson 05 →</Link>
       </div>
 
       <div className="l4-complete-actions">

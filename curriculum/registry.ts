@@ -15,6 +15,10 @@ import {
   BREAK_ASCII_STEPS,
   BREAK_ASCII_STORAGE_KEY,
 } from "./04-breaking-ascii/config";
+import {
+  UNICODE_CODE_POINT_STEPS,
+  UNICODE_CODE_POINT_STORAGE_KEY,
+} from "./05-unicode-code-points/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -73,10 +77,14 @@ export const LESSONS: LessonMeta[] = [
     number: 5,
     slug: "unicode",
     title: "Unicode and code points",
-    question: "How can one system name characters from the whole world?",
-    description: "Separate the idea of a character from its stable numeric code point.",
+    question: "How can one system give global text stable numeric identities?",
+    description: "Discover code points as positions in a global character system, meet Unicode, read U+ notation, and keep identity separate from storage.",
     module: "Text becomes data",
-    status: "coming-soon",
+    status: "available",
+    progress: {
+      storageKey: UNICODE_CODE_POINT_STORAGE_KEY,
+      stepCount: UNICODE_CODE_POINT_STEPS.length,
+    },
   },
   {
     number: 6,
