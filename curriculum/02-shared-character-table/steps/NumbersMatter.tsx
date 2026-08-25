@@ -25,7 +25,7 @@ export function NumbersMatterStep({
       <div className="screen-copy centered-copy compact-copy">
         <p className="eyebrow">Step 5 · Question the numbers</p>
         <h2>Does A need a sensible-looking number?</h2>
-        <p className="lead">If agreement is the real requirement, even a strange shared table should still work.</p>
+        <p className="lead">Your shared table worked. Now replace it with deliberately strange values and test whether communication survives.</p>
       </div>
 
       <div className="l2-weird-lab card">
@@ -48,7 +48,7 @@ export function NumbersMatterStep({
 
       {tested && (
         <div className="l2-question-block">
-          <p className="question-label">Why did the strange table still work?</p>
+          <h3 className="l2-decision-question">Why did the strange table still work?</h3>
           <div className="binary-choice-row">
             <button className={answer === "intrinsic" ? "big-choice selected" : "big-choice"} onClick={() => onAnswer("intrinsic")}>
               <b>7 naturally means B</b><span>The number itself contains something about the letter.</span>
