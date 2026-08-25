@@ -16,7 +16,6 @@ import {
   CODE_POINTS_VS_BYTES_STEPS,
   CODE_POINTS_VS_BYTES_STORAGE_KEY,
   COST_TEXT,
-  LATIN_A,
   ROCKET,
   TOY_WIDTH,
 } from "./config";
@@ -33,7 +32,7 @@ import { RoundTripStep } from "./steps/RoundTrip";
 import type { CodePointsVsBytesPersistedState, RuleConclusion } from "./types";
 
 const STEP_COUNT = CODE_POINTS_VS_BYTES_STEPS.length;
-const A_BYTES = encodeFixedWidth(LATIN_A.decimal, TOY_WIDTH) ?? [];
+const ROCKET_BYTES = encodeFixedWidth(ROCKET.decimal, TOY_WIDTH) ?? [];
 const COST_BYTES = Array.from(COST_TEXT).flatMap((character) => encodeFixedWidth(character.codePointAt(0) ?? 0, TOY_WIDTH) ?? []);
 const COST_TOTAL = COST_BYTES.length;
 const COST_ZEROS = COST_BYTES.filter((byte) => byte === 0).length;
@@ -74,7 +73,7 @@ export function CodePointsVsBytesLesson() {
   const [agreementRecallCommitted, setAgreementRecallCommitted] = useState(false);
   const [agreementRecallAssessment, setAgreementRecallAssessment] = useState<RecallAssessment>(null);
   const [encodingRevealed, setEncodingRevealed] = useState(false);
-  const [encodeAInputs, setEncodeAInputs] = useState<string[]>(emptyInputs(TOY_WIDTH));
+  const [roundTripEncodeInputs, setRoundTripEncodeInputs] = useState<string[]>(emptyInputs(TOY_WIDTH));
   const [decodeRocketInput, setDecodeRocketInput] = useState("");
   const [costTotalInput, setCostTotalInput] = useState("");
   const [costZeroInput, setCostZeroInput] = useState("");
@@ -108,7 +107,7 @@ export function CodePointsVsBytesLesson() {
     setAgreementRecallCommitted(saved?.agreementRecallCommitted === true);
     setAgreementRecallAssessment(safeAssessment(saved?.agreementRecallAssessment));
     setEncodingRevealed(saved?.encodingRevealed === true);
-    setEncodeAInputs(safeInputs(saved?.encodeAInputs, TOY_WIDTH));
+    setRoundTripEncodeInputs(safeInputs(saved?.roundTripEncodeInputs, TOY_WIDTH));
     setDecodeRocketInput(typeof saved?.decodeRocketInput === "string" ? saved.decodeRocketInput : "");
     setCostTotalInput(typeof saved?.costTotalInput === "string" ? saved.costTotalInput : "");
     setCostZeroInput(typeof saved?.costZeroInput === "string" ? saved.costZeroInput : "");
@@ -134,7 +133,7 @@ export function CodePointsVsBytesLesson() {
       agreementRecallCommitted,
       agreementRecallAssessment,
       encodingRevealed,
-      encodeAInputs,
+      roundTripEncodeInputs,
       decodeRocketInput,
       costTotalInput,
       costZeroInput,
@@ -144,7 +143,7 @@ export function CodePointsVsBytesLesson() {
     hasHydrated, currentStep, highestUnlocked, unicodeRecallText, unicodeRecallCommitted,
     unicodeRecallAssessment, byteBits, patternCountInput, storageInputs, inspectedWidths,
     ruleConclusion, mismatchSent, agreementRecallText, agreementRecallCommitted,
-    agreementRecallAssessment, encodingRevealed, encodeAInputs, decodeRocketInput,
+    agreementRecallAssessment, encodingRevealed, roundTripEncodeInputs, decodeRocketInput,
     costTotalInput, costZeroInput,
   ]);
 
@@ -199,10 +198,10 @@ export function CodePointsVsBytesLesson() {
     setInspectedWidths((current) => current.includes(width) ? current : [...current, width]);
   }
 
-  function updateEncodeA(index: number, value: string) {
-    setEncodeAInputs((current) => {
+  function updateRoundTripEncode(index: number, value: string) {
+    setRoundTripEncodeInputs((current) => {
       const next = current.map((item, itemIndex) => itemIndex === index ? value : item);
-      const encodeCorrect = A_BYTES.every((byte, byteIndex) => next[byteIndex].trim() !== "" && Number(next[byteIndex]) === byte);
+      const encodeCorrect = ROCKET_BYTES.every((byte, byteIndex) => next[byteIndex].trim() !== "" && Number(next[byteIndex]) === byte);
       if (encodeCorrect && Number(decodeRocketInput) === ROCKET.decimal) unlock(7);
       return next;
     });
@@ -210,7 +209,7 @@ export function CodePointsVsBytesLesson() {
 
   function updateDecodeRocket(value: string) {
     setDecodeRocketInput(value);
-    const encodeCorrect = A_BYTES.every((byte, index) => encodeAInputs[index].trim() !== "" && Number(encodeAInputs[index]) === byte);
+    const encodeCorrect = ROCKET_BYTES.every((byte, index) => roundTripEncodeInputs[index].trim() !== "" && Number(roundTripEncodeInputs[index]) === byte);
     if (encodeCorrect && Number(value) === ROCKET.decimal) unlock(7);
   }
 
@@ -240,7 +239,7 @@ export function CodePointsVsBytesLesson() {
     setAgreementRecallCommitted(false);
     setAgreementRecallAssessment(null);
     setEncodingRevealed(false);
-    setEncodeAInputs(emptyInputs(TOY_WIDTH));
+    setRoundTripEncodeInputs(emptyInputs(TOY_WIDTH));
     setDecodeRocketInput("");
     setCostTotalInput("");
     setCostZeroInput("");
@@ -308,9 +307,9 @@ export function CodePointsVsBytesLesson() {
       break;
     case 6:
       screen = <RoundTripStep
-        encodeInputs={encodeAInputs}
+        encodeInputs={roundTripEncodeInputs}
         decodeInput={decodeRocketInput}
-        onEncodeChange={updateEncodeA}
+        onEncodeChange={updateRoundTripEncode}
         onDecodeChange={updateDecodeRocket}
         onContinue={() => unlockAndGo(7)}
       />;
