@@ -1,4 +1,8 @@
 import type { LessonMeta } from "./types";
+import {
+  CHARACTER_REPRESENTATION_STEPS,
+  CHARACTER_REPRESENTATION_STORAGE_KEY,
+} from "./01-character-representation/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -9,6 +13,10 @@ export const LESSONS: LessonMeta[] = [
     description: "Build the bridge from a human-visible symbol to a number and then to bits.",
     module: "Text becomes data",
     status: "available",
+    progress: {
+      storageKey: CHARACTER_REPRESENTATION_STORAGE_KEY,
+      stepCount: CHARACTER_REPRESENTATION_STEPS.length,
+    },
   },
   {
     number: 2,
