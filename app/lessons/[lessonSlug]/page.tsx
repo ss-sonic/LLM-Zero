@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CharacterRepresentationLesson } from "../../../curriculum/01-character-representation/lesson";
 import { SharedCharacterTableLesson } from "../../../curriculum/02-shared-character-table/lesson";
 import { AsciiLesson } from "../../../curriculum/03-ascii/lesson";
+import { BreakingAsciiLesson } from "../../../curriculum/04-breaking-ascii/lesson";
 import { LESSONS, getLessonMeta } from "../../../curriculum/registry";
 
 export function generateStaticParams() {
@@ -44,6 +45,8 @@ export default async function LessonPage({
       return <SharedCharacterTableLesson />;
     case "ascii":
       return <AsciiLesson />;
+    case "breaking-ascii":
+      return <BreakingAsciiLesson />;
     default:
       notFound();
   }
