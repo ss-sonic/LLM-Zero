@@ -1,5 +1,5 @@
 export type MissingAnswer = "hidden" | "missing" | "binary" | null;
-export type PrivateFixAnswer = "size" | "agreement" | "binary" | null;
+export type PrivateFixAnswer = "size" | "agreement" | "binary" | "needs-work" | null;
 export type BiggerAnswer = "private" | "shared" | "guess" | null;
 export type MixedAnswer = "ascii" | "outside" | null;
 
@@ -12,6 +12,7 @@ export type BreakingAsciiPersistedState = {
   privateAssigned: boolean;
   privateSent: boolean;
   privateFixAnswer: PrivateFixAnswer;
+  privateRecallText: string;
   worldSeenIds: string[];
   includedAreas: string[];
   biggerAnswer: BiggerAnswer;

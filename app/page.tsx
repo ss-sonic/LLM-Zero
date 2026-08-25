@@ -1,4 +1,5 @@
 import { CourseMap } from "../components/course/CourseMap";
+import { LlmJourney } from "../components/course/LlmJourney";
 
 export default function HomePage() {
   return (
@@ -21,6 +22,8 @@ export default function HomePage() {
           <p>No hidden prerequisites. No magic boxes. One small problem, experiment, and mental model at a time.</p>
         </section>
 
+        <LlmJourney />
+
         <section className="course-section">
           <div className="course-heading">
             <div>
@@ -35,7 +38,7 @@ export default function HomePage() {
 
         <section className="home-principles" aria-label="How LLM Zero teaches">
           <article><b>Problem before solution</b><p>Feel why an idea had to be invented before learning its name.</p></article>
-          <article><b>Interaction over memorization</b><p>Predict, manipulate, break, inspect, and rebuild instead of passively reading.</p></article>
+          <article><b>Interaction over memorization</b><p>Predict, construct, recall, break, inspect, and rebuild instead of passively reading.</p></article>
           <article><b>Simple language, precise truth</b><p>Accessible enough for a curious teenager without hiding the real mechanics.</p></article>
         </section>
       </div>

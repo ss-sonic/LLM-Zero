@@ -1,33 +1,37 @@
 "use client";
 
-import { ChoiceCard } from "../../../components/ui/ChoiceCard";
-import { Feedback } from "../../../components/ui/Feedback";
+import { QuestionPrompt } from "../../../components/ui/QuestionPrompt";
+import { TextRecall } from "../../../components/ui/TextRecall";
 import type { PrivateFixAnswer } from "../types";
 
 export function PrivateFixStep({
   assigned,
   sent,
   answer,
+  recallText,
   onAssign,
   onSend,
-  onAnswer,
+  onRecallChange,
+  onRecallSubmit,
   onContinue,
 }: {
   assigned: boolean;
   sent: boolean;
   answer: PrivateFixAnswer;
+  recallText: string;
   onAssign: () => void;
   onSend: () => void;
-  onAnswer: (answer: Exclude<PrivateFixAnswer, null>) => void;
+  onRecallChange: (value: string) => void;
+  onRecallSubmit: (value: string) => void;
   onContinue: () => void;
 }) {
   return (
     <div className="screen-layout centered-screen wide-screen l4-screen">
-      <div className="screen-copy centered-copy compact-copy">
-        <p className="eyebrow">Step 3 · Try a private fix</p>
-        <h2>Can we just invent é → 200 ourselves?</h2>
-        <p className="lead">Computer 1 is free to write down a private rule. The real test is whether Computer 2 can recover the same character.</p>
-      </div>
+      <QuestionPrompt
+        eyebrow="Step 3 · Try a private fix"
+        title="Can we just invent é → 200 ourselves?"
+        lead="Computer 1 is free to write down a private rule. The real test is whether Computer 2 can recover the same character."
+      />
 
       <div className="l4-private-lab">
         <div className="card l4-machine-card">
@@ -49,27 +53,21 @@ export function PrivateFixStep({
         <button className="primary-button l4-main-action" onClick={onSend}>Send 200 to Computer 2 →</button>
       ) : (
         <div className="l4-question-block">
-          <h3 className="l4-decision-question">Why didn&apos;t this restore communication?</h3>
-          <div className="l4-choice-grid">
-            <ChoiceCard variant="large" selected={answer === "size"} onClick={() => onAnswer("size")}>
-              <b>200 is outside ASCII</b><span>The only issue is that we picked a value larger than 127.</span>
-            </ChoiceCard>
-            <ChoiceCard variant="large" selected={answer === "agreement"} onClick={() => onAnswer("agreement")}>
-              <b>The receiver never agreed</b><span>A private mapping on the sender does not create a shared interpretation.</span>
-            </ChoiceCard>
-            <ChoiceCard variant="large" selected={answer === "binary"} onClick={() => onAnswer("binary")}>
-              <b>Binary cannot hold 200</b><span>The number itself cannot be represented with bits.</span>
-            </ChoiceCard>
-          </div>
+          <h3 className="l4-decision-question">Without looking back: what principle from Lesson 02 is missing here?</h3>
+          <TextRecall
+            label="Explain why Computer 2 cannot recover é from 200."
+            value={recallText}
+            placeholder="For example: Computer 2 ..."
+            status={answer === "agreement" ? "success" : answer === "needs-work" || answer === "size" || answer === "binary" ? "needs-work" : "idle"}
+            nudge="Focus on what the receiver knows. A different numeric value would not fix a rule that exists only on the sender."
+            success="A number communicates a character only when both sides share the mapping that gives that number its interpretation."
+            onChange={onRecallChange}
+            onSubmit={onRecallSubmit}
+          />
 
-          {answer === "size" && <Feedback tone="nudge">200 is indeed outside ASCII. But choosing a different number still would not make a private rule shared. Computer 2 needs the same published mapping.</Feedback>}
-          {answer === "binary" && <Feedback tone="nudge">Bits can represent 200. The problem is interpretation: Computer 2 has no shared rule saying that 200 means é.</Feedback>}
-          {answer === "agreement" && (
-            <Feedback tone="success">
-              <div><b>Exactly.</b><span>We rediscovered Lesson 02: inventing a number locally is not enough. A new character needs a shared assignment that everyone can know.</span></div>
-              <button className="primary-button" onClick={onContinue}>See how large the problem is →</button>
-            </Feedback>
-          )}
+          {answer === "agreement" ? (
+            <button className="primary-button l4-main-action" onClick={onContinue}>See how large the problem is →</button>
+          ) : null}
         </div>
       )}
     </div>

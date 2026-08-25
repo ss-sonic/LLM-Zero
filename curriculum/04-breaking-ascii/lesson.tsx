@@ -38,6 +38,13 @@ function safeMixedAnswers(value: unknown): MixedAnswer[] {
   return value.map((item) => item === "ascii" || item === "outside" ? item : null);
 }
 
+function isSharedAgreementRecall(value: string) {
+  const text = value.toLowerCase().replace(/[’']/g, "'");
+  const pointsToSharedKnowledge = /(shared|same|agree|agreement|both|receiver|computer 2|other computer|doesn't know|does not know)/.test(text);
+  const pointsToInterpretation = /(rule|mapping|table|meaning|mean|interpret|know|understand)/.test(text);
+  return pointsToSharedKnowledge && pointsToInterpretation;
+}
+
 export function BreakingAsciiLesson() {
   const [hasHydrated, setHasHydrated] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -48,6 +55,7 @@ export function BreakingAsciiLesson() {
   const [privateAssigned, setPrivateAssigned] = useState(false);
   const [privateSent, setPrivateSent] = useState(false);
   const [privateFixAnswer, setPrivateFixAnswer] = useState<PrivateFixAnswer>(null);
+  const [privateRecallText, setPrivateRecallText] = useState("");
   const [worldSeenIds, setWorldSeenIds] = useState<string[]>([]);
   const [includedAreas, setIncludedAreas] = useState<string[]>([]);
   const [biggerAnswer, setBiggerAnswer] = useState<BiggerAnswer>(null);
@@ -74,7 +82,14 @@ export function BreakingAsciiLesson() {
     setMissingAnswer(saved?.missingAnswer === "hidden" || saved?.missingAnswer === "missing" || saved?.missingAnswer === "binary" ? saved.missingAnswer : null);
     setPrivateAssigned(saved?.privateAssigned === true);
     setPrivateSent(saved?.privateSent === true);
-    setPrivateFixAnswer(saved?.privateFixAnswer === "size" || saved?.privateFixAnswer === "agreement" || saved?.privateFixAnswer === "binary" ? saved.privateFixAnswer : null);
+    setPrivateFixAnswer(
+      saved?.privateFixAnswer === "agreement" || saved?.privateFixAnswer === "needs-work"
+        ? saved.privateFixAnswer
+        : saved?.privateFixAnswer === "size" || saved?.privateFixAnswer === "binary"
+          ? "needs-work"
+          : null,
+    );
+    setPrivateRecallText(typeof saved?.privateRecallText === "string" ? saved.privateRecallText : "");
     setWorldSeenIds(safeStringArray(saved?.worldSeenIds, WORLD_SAMPLES.map((sample) => sample.id)));
     setIncludedAreas(safeStringArray(saved?.includedAreas, EXPANSION_AREAS));
     setBiggerAnswer(saved?.biggerAnswer === "private" || saved?.biggerAnswer === "shared" || saved?.biggerAnswer === "guess" ? saved.biggerAnswer : null);
@@ -94,13 +109,14 @@ export function BreakingAsciiLesson() {
       privateAssigned,
       privateSent,
       privateFixAnswer,
+      privateRecallText,
       worldSeenIds,
       includedAreas,
       biggerAnswer,
       mixedAnswers,
     };
     writePersistedLessonState(BREAK_ASCII_STORAGE_KEY, state);
-  }, [hasHydrated, currentStep, highestUnlocked, asciiProofSent, cafeTried, missingAnswer, privateAssigned, privateSent, privateFixAnswer, worldSeenIds, includedAreas, biggerAnswer, mixedAnswers]);
+  }, [hasHydrated, currentStep, highestUnlocked, asciiProofSent, cafeTried, missingAnswer, privateAssigned, privateSent, privateFixAnswer, privateRecallText, worldSeenIds, includedAreas, biggerAnswer, mixedAnswers]);
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -140,6 +156,7 @@ export function BreakingAsciiLesson() {
     setPrivateAssigned(false);
     setPrivateSent(false);
     setPrivateFixAnswer(null);
+    setPrivateRecallText("");
     setWorldSeenIds([]);
     setIncludedAreas([]);
     setBiggerAnswer(null);
@@ -172,9 +189,15 @@ export function BreakingAsciiLesson() {
           assigned={privateAssigned}
           sent={privateSent}
           answer={privateFixAnswer}
+          recallText={privateRecallText}
           onAssign={() => setPrivateAssigned(true)}
           onSend={() => setPrivateSent(true)}
-          onAnswer={(answer) => { setPrivateFixAnswer(answer); if (answer === "agreement") unlock(3); }}
+          onRecallChange={(value) => { setPrivateRecallText(value); if (privateFixAnswer !== "agreement") setPrivateFixAnswer(null); }}
+          onRecallSubmit={(value) => {
+            const correct = isSharedAgreementRecall(value);
+            setPrivateFixAnswer(correct ? "agreement" : "needs-work");
+            if (correct) unlock(3);
+          }}
           onContinue={() => unlockAndGo(3)}
         />
       );

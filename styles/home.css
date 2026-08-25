@@ -36,6 +36,40 @@
   line-height: 1.5;
 }
 
+.llm-journey {
+  margin: 0 0 64px;
+  padding: 30px;
+  border: 1px solid var(--ink);
+  border-radius: 24px;
+  background: #171717;
+  color: var(--paper);
+}
+.journey-copy { max-width: 820px; }
+.journey-copy .eyebrow { margin-bottom: 12px; }
+.journey-copy h2 { margin: 0; font-size: clamp(30px, 4.5vw, 48px); line-height: 1.02; letter-spacing: -.045em; }
+.journey-copy h2 code { font-size: .88em; color: #ffd7ca; }
+.journey-copy > p:last-child { max-width: 720px; margin: 16px 0 0; color: #bcbcbc; line-height: 1.55; }
+.journey-pipeline { margin-top: 28px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.journey-stage {
+  min-height: 128px;
+  padding: 15px;
+  border: 1px solid #3b3b3b;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+}
+.journey-stage.current { border-color: var(--accent); background: #241c19; }
+.journey-stage.future { opacity: .56; }
+.journey-stage small { color: #888; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; font-weight: 800; }
+.journey-stage.current small { color: var(--accent); }
+.journey-stage b { font-size: 16px; }
+.journey-stage span { color: #aaa; font-size: 11px; line-height: 1.4; }
+.journey-now { margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; display: flex; gap: 10px; align-items: baseline; }
+.journey-now span { color: #888; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; font-weight: 800; }
+.journey-now b { color: #f5f1e8; }
+
 .course-section { border-top: 1px solid var(--line); padding-top: 28px; }
 .course-heading { display: flex; justify-content: space-between; gap: 24px; align-items: flex-end; margin-bottom: 22px; }
 .course-heading small { color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 800; }
@@ -71,10 +105,18 @@
 .home-principles b { display: block; margin-bottom: 8px; font-size: 16px; }
 .home-principles p { margin: 0; color: var(--muted); line-height: 1.55; }
 
+@media (max-width: 940px) {
+  .journey-pipeline { grid-template-columns: repeat(4, 1fr); }
+}
+
 @media (max-width: 760px) {
   .home-header { height: 66px; }
   .home-header .open-badge { display: none; }
   .home-main { padding-top: 46px; }
+  .llm-journey { padding: 22px; }
+  .journey-pipeline { grid-template-columns: 1fr 1fr; }
+  .journey-stage { min-height: 110px; }
+  .journey-now { align-items: flex-start; flex-direction: column; }
   .course-heading { align-items: flex-start; flex-direction: column; }
   .lesson-row { grid-template-columns: 44px 1fr; }
   .lesson-action { grid-column: 2; justify-self: start; }
