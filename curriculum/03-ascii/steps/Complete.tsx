@@ -26,10 +26,10 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
       <div className="next-lesson-card">
         <div>
           <small>Next mystery</small>
-          <h3>What happens when the world needs characters ASCII does not contain?</h3>
-          <p>We found the failure. Next we will push on it hard enough to understand why a much larger character system became necessary.</p>
+          <h3>What happens when text needs characters ASCII does not contain?</h3>
+          <p>Push ASCII past its repertoire, try a tempting private fix, and see why a much larger shared character system becomes necessary.</p>
         </div>
-        <span className="locked-pill">🔒 Lesson 04 · Break ASCII</span>
+        <Link className="primary-button" href="/lessons/breaking-ascii">Start Lesson 04 →</Link>
       </div>
 
       <div className="l3-complete-actions">

@@ -11,6 +11,10 @@ import {
   ASCII_STEPS,
   ASCII_STORAGE_KEY,
 } from "./03-ascii/config";
+import {
+  BREAK_ASCII_STEPS,
+  BREAK_ASCII_STORAGE_KEY,
+} from "./04-breaking-ascii/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -56,10 +60,14 @@ export const LESSONS: LessonMeta[] = [
     number: 4,
     slug: "breaking-ascii",
     title: "Break ASCII",
-    question: "What happens when the world needs more than English characters?",
-    description: "Try real text that ASCII cannot represent and discover the limitation yourself.",
+    question: "What happens when text needs characters ASCII does not contain?",
+    description: "Break ASCII deliberately, reject private mapping fixes, and discover why global text needs a much larger shared character repertoire.",
     module: "Text becomes data",
-    status: "coming-soon",
+    status: "available",
+    progress: {
+      storageKey: BREAK_ASCII_STORAGE_KEY,
+      stepCount: BREAK_ASCII_STEPS.length,
+    },
   },
   {
     number: 5,
