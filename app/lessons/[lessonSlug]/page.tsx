@@ -5,6 +5,7 @@ import { SharedCharacterTableLesson } from "../../../curriculum/02-shared-charac
 import { AsciiLesson } from "../../../curriculum/03-ascii/lesson";
 import { BreakingAsciiLesson } from "../../../curriculum/04-breaking-ascii/lesson";
 import { UnicodeCodePointLesson } from "../../../curriculum/05-unicode-code-points/lesson";
+import { CodePointsVsBytesLesson } from "../../../curriculum/06-code-points-vs-bytes/lesson";
 import { LESSONS, getLessonMeta } from "../../../curriculum/registry";
 
 export function generateStaticParams() {
@@ -50,6 +51,8 @@ export default async function LessonPage({
       return <BreakingAsciiLesson />;
     case "unicode":
       return <UnicodeCodePointLesson />;
+    case "code-points-vs-bytes":
+      return <CodePointsVsBytesLesson />;
     default:
       notFound();
   }

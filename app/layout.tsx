@@ -7,6 +7,7 @@ import "../curriculum/02-shared-character-table/styles.css";
 import "../curriculum/03-ascii/styles.css";
 import "../curriculum/04-breaking-ascii/styles.css";
 import "../curriculum/05-unicode-code-points/styles.css";
+import "../curriculum/06-code-points-vs-bytes/styles.css";
 import "../styles/lesson-typography.css";
 
 const title = "LLM Zero — Learn LLMs from First Principles";

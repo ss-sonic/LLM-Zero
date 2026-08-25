@@ -19,6 +19,10 @@ import {
   UNICODE_CODE_POINT_STEPS,
   UNICODE_CODE_POINT_STORAGE_KEY,
 } from "./05-unicode-code-points/config";
+import {
+  CODE_POINTS_VS_BYTES_STEPS,
+  CODE_POINTS_VS_BYTES_STORAGE_KEY,
+} from "./06-code-points-vs-bytes/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -91,9 +95,13 @@ export const LESSONS: LessonMeta[] = [
     slug: "code-points-vs-bytes",
     title: "A code point is not a byte",
     question: "If Unicode gives a character a number, what actually gets stored?",
-    description: "Separate character identity, code points, encodings, bytes, and bits.",
+    description: "Build a code point out of bytes, change the rule, break a message by disagreeing about it, and separate identity from encoding.",
     module: "Text becomes data",
-    status: "coming-soon",
+    status: "available",
+    progress: {
+      storageKey: CODE_POINTS_VS_BYTES_STORAGE_KEY,
+      stepCount: CODE_POINTS_VS_BYTES_STEPS.length,
+    },
   },
   {
     number: 7,

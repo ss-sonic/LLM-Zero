@@ -29,7 +29,7 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
           <h3>If 🚀 is U+1F680, what actually goes into memory?</h3>
           <p>The code point is far larger than one byte. Next we will separate character identity from the encoding that turns that identity into stored data.</p>
         </div>
-        <span className="locked-pill">🔒 Lesson 06 · A code point is not a byte</span>
+        <Link className="primary-button" href="/lessons/code-points-vs-bytes">Start Lesson 06 →</Link>
       </div>
 
       <div className="l5-complete-actions">
