@@ -1,11 +1,11 @@
 export const CODE_POINTS_VS_BYTES_STEPS = [
   "The missing bytes",
   "One byte's limit",
-  "Invent a storage rule",
+  "Invent one equation",
   "Change the rule",
   "Break the agreement",
   "Name the missing idea",
-  "Run it both ways",
+  "One rule, two directions",
   "Count the waste",
   "Complete",
 ];
