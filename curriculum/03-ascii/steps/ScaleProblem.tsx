@@ -17,7 +17,7 @@ export function ScaleProblemStep({
     <div className="screen-layout centered-screen wide-screen l3-screen">
       <div className="screen-copy centered-copy compact-copy">
         <p className="eyebrow">Lesson 03 · Scale the agreement</p>
-        <h1>Thousands of computers need to exchange text. How should they all agree on the same table?</h1>
+        <h1>How can thousands of computers agree on one character table?</h1>
         <p className="lead">In Lesson 02, two computers could copy the same rulebook. Now imagine every manufacturer and every machine inventing its own mapping.</p>
       </div>
 
