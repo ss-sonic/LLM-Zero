@@ -4,7 +4,7 @@ export const HEXADECIMAL_BRIDGE_STEPS = [
   "Meet six more digits",
   "Build hex digits",
   "One byte, two hex digits",
-  "Convert both ways",
+  "One value, both directions",
   "Compress the bytes",
   "Complete",
 ];
