@@ -47,7 +47,9 @@ export function ManualFixStep({
           </div>
 
           <div className="l2-question-block">
-            <h3 className="l2-decision-question">If these computers talk all day, what is the cleaner design?</h3>
+            <div className="screen-copy centered-copy compact-copy">
+              <h2>If these computers talk all day, what is the cleaner design?</h2>
+            </div>
             <div className="binary-choice-row">
               <button className={choice === "instructions" ? "big-choice selected" : "big-choice"} onClick={() => onChoice("instructions")}>
                 <b>Repeat the table</b><span>Keep explaining the same mapping inside every message.</span>
