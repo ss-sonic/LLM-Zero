@@ -100,6 +100,21 @@ Good interaction examples:
 - flip a bit and see a numeric consequence;
 - predict an output before revealing it.
 
+### Questions must win the visual hierarchy
+
+Whenever the learner is expected to predict, choose, or explain something, the question must be one of the strongest visual elements on the screen. Do not make answer-card titles visually louder than the prompt they answer.
+
+Do not reveal the conclusion in a headline before the learner has had a chance to discover it. The preferred order is:
+
+1. context;
+2. dominant question or task;
+3. evidence / experiment;
+4. choices or action;
+5. feedback;
+6. only then reveal the principle.
+
+If an interaction creates a new decision halfway through a screen, give that new question fresh visual emphasis instead of reusing a tiny helper label.
+
 Decorative motion is secondary. Respect `prefers-reduced-motion`.
 
 ## 8. Accessibility and responsive behavior are part of correctness
