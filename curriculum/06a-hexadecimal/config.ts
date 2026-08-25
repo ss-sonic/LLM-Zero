@@ -30,8 +30,8 @@ export const A_CODE_POINT_DECIMAL = 65;
 
 export const FORWARD_BINARY = "11110110";
 export const FORWARD_HEX = ["F", "6"] as const;
-export const REVERSE_HEX = "9A";
-export const REVERSE_BITS = ["1001", "1010"] as const;
+export const REVERSE_HEX = "F6";
+export const REVERSE_BITS = ["1111", "0110"] as const;
 
 export const COMPRESSION_BITS = PAIN_SEQUENCE_A;
 export const COMPRESSION_HEX = ["F0", "9F", "9A", "80"] as const;
