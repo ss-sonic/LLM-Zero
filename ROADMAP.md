@@ -14,7 +14,7 @@ The roadmap tracks two things in parallel:
 - [x] Lesson 03 — ASCII: one early shared agreement
 - [x] Lesson 04 — Break ASCII with the world's languages
 - [x] Lesson 05 — Unicode and code points
-- [ ] Lesson 06 — A code point is not a byte
+- [x] Lesson 06 — A code point is not a byte
 - [ ] Foundation bridge — Hexadecimal as compact binary notation (`0000–1111 ↔ 0–F`)
 - [ ] Lesson 07 — Build UTF-8 by hand
 - [ ] Lesson 08 — UTF-8 vs UTF-16 vs UTF-32
@@ -22,9 +22,7 @@ The roadmap tracks two things in parallel:
 
 **Interaction target:** prediction + discrete construction + cross-lesson recall + short learner-produced explanations.
 
-**Retrofit debt.** Lessons 01–05 shipped before the assessment modes existed, so their
-completion checks are still recognition-only. Lesson 04's private-fix recall is the
-reference implementation. Outstanding:
+**Retrofit debt.** Lessons 01–05 shipped before the assessment modes existed, so their completion checks are still recognition-only. Lesson 04's private-fix recall is the reference implementation. Outstanding:
 
 - [ ] Lesson 01 — `FinalCheck` is a two-card recognition check
 - [ ] Lesson 03 — completion check is recognition-only

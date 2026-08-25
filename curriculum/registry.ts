@@ -19,6 +19,10 @@ import {
   UNICODE_CODE_POINT_STEPS,
   UNICODE_CODE_POINT_STORAGE_KEY,
 } from "./05-unicode-code-points/config";
+import {
+  CODE_POINTS_VS_BYTES_STEPS,
+  CODE_POINTS_VS_BYTES_STORAGE_KEY,
+} from "./06-code-points-vs-bytes/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -29,10 +33,7 @@ export const LESSONS: LessonMeta[] = [
     description: "Build the bridge from a human-visible symbol to a number and then to bits.",
     module: "Text becomes data",
     status: "available",
-    progress: {
-      storageKey: CHARACTER_REPRESENTATION_STORAGE_KEY,
-      stepCount: CHARACTER_REPRESENTATION_STEPS.length,
-    },
+    progress: { storageKey: CHARACTER_REPRESENTATION_STORAGE_KEY, stepCount: CHARACTER_REPRESENTATION_STEPS.length },
   },
   {
     number: 2,
@@ -42,10 +43,7 @@ export const LESSONS: LessonMeta[] = [
     description: "Experience why communication breaks when two machines disagree about what a number means.",
     module: "Text becomes data",
     status: "available",
-    progress: {
-      storageKey: SHARED_CHARACTER_TABLE_STORAGE_KEY,
-      stepCount: SHARED_CHARACTER_TABLE_STEPS.length,
-    },
+    progress: { storageKey: SHARED_CHARACTER_TABLE_STORAGE_KEY, stepCount: SHARED_CHARACTER_TABLE_STEPS.length },
   },
   {
     number: 3,
@@ -55,10 +53,7 @@ export const LESSONS: LessonMeta[] = [
     description: "Discover ASCII as a published character-number standard, inspect its structure, and find the boundary of its 128 values.",
     module: "Text becomes data",
     status: "available",
-    progress: {
-      storageKey: ASCII_STORAGE_KEY,
-      stepCount: ASCII_STEPS.length,
-    },
+    progress: { storageKey: ASCII_STORAGE_KEY, stepCount: ASCII_STEPS.length },
   },
   {
     number: 4,
@@ -68,10 +63,7 @@ export const LESSONS: LessonMeta[] = [
     description: "Break ASCII deliberately, reject private mapping fixes, and discover why global text needs a much larger shared character repertoire.",
     module: "Text becomes data",
     status: "available",
-    progress: {
-      storageKey: BREAK_ASCII_STORAGE_KEY,
-      stepCount: BREAK_ASCII_STEPS.length,
-    },
+    progress: { storageKey: BREAK_ASCII_STORAGE_KEY, stepCount: BREAK_ASCII_STEPS.length },
   },
   {
     number: 5,
@@ -81,19 +73,17 @@ export const LESSONS: LessonMeta[] = [
     description: "Discover code points as positions in a global character system, meet Unicode, read U+ notation, and keep identity separate from storage.",
     module: "Text becomes data",
     status: "available",
-    progress: {
-      storageKey: UNICODE_CODE_POINT_STORAGE_KEY,
-      stepCount: UNICODE_CODE_POINT_STEPS.length,
-    },
+    progress: { storageKey: UNICODE_CODE_POINT_STORAGE_KEY, stepCount: UNICODE_CODE_POINT_STEPS.length },
   },
   {
     number: 6,
     slug: "code-points-vs-bytes",
     title: "A code point is not a byte",
     question: "If Unicode gives a character a number, what actually gets stored?",
-    description: "Separate character identity, code points, encodings, bytes, and bits.",
+    description: "Invent an encoding rule, prove code points do not determine bytes, and separate character identity from concrete storage.",
     module: "Text becomes data",
-    status: "coming-soon",
+    status: "available",
+    progress: { storageKey: CODE_POINTS_VS_BYTES_STORAGE_KEY, stepCount: CODE_POINTS_VS_BYTES_STEPS.length },
   },
   {
     number: 7,
