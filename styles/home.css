@@ -61,9 +61,11 @@
   gap: 7px;
 }
 .journey-stage.current { border-color: var(--accent); background: #241c19; }
+.journey-stage.done { border-color: #4a4a4a; background: #1f1f1f; }
 .journey-stage.future { opacity: .56; }
 .journey-stage small { color: #888; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; font-weight: 800; }
 .journey-stage.current small { color: var(--accent); }
+.journey-stage.done small { color: #9fd39f; }
 .journey-stage b { font-size: 16px; }
 .journey-stage span { color: #aaa; font-size: 11px; line-height: 1.4; }
 .journey-now { margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; display: flex; gap: 10px; align-items: baseline; }

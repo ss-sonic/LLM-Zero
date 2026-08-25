@@ -22,6 +22,15 @@ The roadmap tracks two things in parallel:
 
 **Interaction target:** prediction + discrete construction + cross-lesson recall + short learner-produced explanations.
 
+**Retrofit debt.** Lessons 01–05 shipped before the assessment modes existed, so their
+completion checks are still recognition-only. Lesson 04's private-fix recall is the
+reference implementation. Outstanding:
+
+- [ ] Lesson 01 — `FinalCheck` is a two-card recognition check
+- [ ] Lesson 03 — completion check is recognition-only
+- [ ] Lesson 05 — `GlobalIdentityChallenge` matches against a table shown one screen earlier
+- [ ] Lesson 02 — audit for one honest retrieval opportunity
+
 ## Phase 2 — Text becomes model input
 
 - [ ] Why not feed raw characters directly?
@@ -102,8 +111,8 @@ The roadmap tracks two things in parallel:
 
 These are format stress tests, not learner prerequisites.
 
-- [x] Continuous-math prototype — gradient descent: live parameter scrubber + loss curve + numeric equation entry (`/labs/gradient-descent`)
-- [ ] Symbolic prototype — multi-step chain-rule/backprop derivation
+- [x] Continuous-math prototype — gradient descent: live parameter scrubber, loss curve, learner-chosen measurements, and a multi-step numeric derivation (`/labs/gradient-descent`)
+- [ ] Symbolic prototype — rearranging an expression, not evaluating a given one. The gradient lab derives numerically; it does not test symbolic manipulation.
 - [ ] Attention prototype — construct and inspect a small attention matrix
 - [ ] Code/build prototype — complete a tiny differentiable component and observe its output
 

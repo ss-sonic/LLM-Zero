@@ -81,24 +81,103 @@
   font-size: 11px;
 }
 
-.probeRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.probeForm {
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  align-items: flex-end;
   margin-top: 18px;
 }
 
-.probe {
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: var(--card);
-  padding: 18px;
+.probeForm label {
+  display: grid;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.probeError {
+  margin: 10px 0 0;
+  color: #b3341a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.probeTable {
+  width: 100%;
+  margin-top: 18px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.probeTable caption {
+  text-align: left;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 10px;
+  font-weight: 800;
+  padding-bottom: 8px;
+}
+
+.probeTable th,
+.probeTable td {
+  border-bottom: 1px solid var(--line);
+  padding: 9px 10px;
   text-align: left;
 }
 
-.probe b { display: block; margin-bottom: 5px; font-size: 20px; }
-.probe span { color: var(--muted); line-height: 1.45; }
-.probe:disabled { opacity: .55; }
+.probeTable th {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.probeTable td { font-weight: 700; }
+
+.better { color: #1d7a3d; }
+.worse { color: #b3341a; }
+
+.directionBlock {
+  width: min(720px, 100%);
+  margin: 22px auto 0;
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.directionQuestion {
+  margin: 0;
+  font-size: clamp(20px, 3vw, 26px);
+  letter-spacing: -.03em;
+}
+
+.directionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.derivationRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.derivationStep {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.tick { color: #1d7a3d; font-size: 24px; }
 
 .equationCard {
   width: min(720px, 100%);
@@ -159,7 +238,8 @@
 @media (max-width: 820px) {
   .labGrid { grid-template-columns: 1fr; }
   .metricGrid { grid-template-columns: 1fr; }
-  .probeRow { grid-template-columns: 1fr; }
+  .probeForm { flex-direction: column; align-items: stretch; }
+  .derivationRow { grid-template-columns: 1fr; }
   .resultStrip { grid-template-columns: 1fr; }
   .resultStrip > span { transform: rotate(90deg); justify-self: center; }
 }

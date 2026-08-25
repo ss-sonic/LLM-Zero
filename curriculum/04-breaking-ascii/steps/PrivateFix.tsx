@@ -1,28 +1,33 @@
 "use client";
 
 import { QuestionPrompt } from "../../../components/ui/QuestionPrompt";
-import { TextRecall } from "../../../components/ui/TextRecall";
-import type { PrivateFixAnswer } from "../types";
+import { TextRecall, type RecallAssessment } from "../../../components/ui/TextRecall";
 
 export function PrivateFixStep({
   assigned,
   sent,
-  answer,
   recallText,
+  recallCommitted,
+  recallAssessment,
   onAssign,
   onSend,
   onRecallChange,
-  onRecallSubmit,
+  onRecallCommit,
+  onRecallAssess,
+  onRecallRewrite,
   onContinue,
 }: {
   assigned: boolean;
   sent: boolean;
-  answer: PrivateFixAnswer;
   recallText: string;
+  recallCommitted: boolean;
+  recallAssessment: RecallAssessment;
   onAssign: () => void;
   onSend: () => void;
   onRecallChange: (value: string) => void;
-  onRecallSubmit: (value: string) => void;
+  onRecallCommit: () => void;
+  onRecallAssess: (assessment: Exclude<RecallAssessment, null>) => void;
+  onRecallRewrite: () => void;
   onContinue: () => void;
 }) {
   return (
@@ -53,19 +58,21 @@ export function PrivateFixStep({
         <button className="primary-button l4-main-action" onClick={onSend}>Send 200 to Computer 2 →</button>
       ) : (
         <div className="l4-question-block">
-          <h3 className="l4-decision-question">Without looking back: what principle from Lesson 02 is missing here?</h3>
+          <h3 className="l4-decision-question">Without looking back: what did Lesson 02 prove about a number travelling between two machines?</h3>
           <TextRecall
-            label="Explain why Computer 2 cannot recover é from 200."
+            label="Write the principle in your own words."
             value={recallText}
-            placeholder="For example: Computer 2 ..."
-            status={answer === "agreement" ? "success" : answer === "needs-work" || answer === "size" || answer === "binary" ? "needs-work" : "idle"}
-            nudge="Focus on what the receiver knows. A different numeric value would not fix a rule that exists only on the sender."
-            success="A number communicates a character only when both sides share the mapping that gives that number its interpretation."
+            placeholder="One sentence is enough."
+            principle="A number only communicates a character when both machines already share the mapping that gives that number its meaning. A rule written on one side is not an agreement."
+            committed={recallCommitted}
+            assessment={recallAssessment}
             onChange={onRecallChange}
-            onSubmit={onRecallSubmit}
+            onCommit={onRecallCommit}
+            onAssess={onRecallAssess}
+            onRewrite={onRecallRewrite}
           />
 
-          {answer === "agreement" ? (
+          {recallAssessment !== null ? (
             <button className="primary-button l4-main-action" onClick={onContinue}>See how large the problem is →</button>
           ) : null}
         </div>

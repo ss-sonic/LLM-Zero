@@ -6,30 +6,50 @@ import { Feedback } from "../../components/ui/Feedback";
 import { QuestionPrompt } from "../../components/ui/QuestionPrompt";
 import styles from "./GradientDescentLab.module.css";
 
-const STEP_LABELS = ["Scrub the weight", "Probe direction", "Apply an update", "Complete"];
+const STEP_LABELS = ["Scrub the weight", "Probe direction", "Derive and update", "Complete"];
 const X_VALUE = 2;
 const TARGET = 10;
+const LEARNING_RATE = 0.1;
+const PROBE_ORIGIN = 3;
+const W_MIN = -1;
+const W_MAX = 8;
 
 function prediction(weight: number) {
   return X_VALUE * weight;
 }
 
+function error(weight: number) {
+  return prediction(weight) - TARGET;
+}
+
 function loss(weight: number) {
-  return (prediction(weight) - TARGET) ** 2;
+  return error(weight) ** 2;
+}
+
+/** d(loss)/dw for loss = (x·w − target)², i.e. 2 · error · x. */
+function gradient(weight: number) {
+  return 2 * error(weight) * X_VALUE;
 }
 
 function format(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
 }
 
+function matches(input: string, expected: number) {
+  const numeric = Number(input);
+  return input.trim() !== "" && Number.isFinite(numeric) && Math.abs(numeric - expected) < 0.001;
+}
+
+type Probe = { weight: number; loss: number };
+
 function LossChart({ weight }: { weight: number }) {
   const points = useMemo(() => Array.from({ length: 91 }, (_, index) => {
-    const w = -1 + index * .1;
-    const x = 32 + ((w + 1) / 9) * 556;
+    const w = W_MIN + index * .1;
+    const x = 32 + ((w - W_MIN) / (W_MAX - W_MIN)) * 556;
     const y = 210 - (loss(w) / 144) * 176;
     return `${x},${y}`;
   }).join(" "), []);
-  const x = 32 + ((weight + 1) / 9) * 556;
+  const x = 32 + ((weight - W_MIN) / (W_MAX - W_MIN)) * 556;
   const y = 210 - (loss(weight) / 144) * 176;
 
   return (
@@ -40,7 +60,7 @@ function LossChart({ weight }: { weight: number }) {
         <polyline points={points} fill="none" stroke="currentColor" strokeWidth="3" opacity=".72" />
         <circle cx={x} cy={y} r="7" fill="var(--accent)" stroke="var(--ink)" strokeWidth="2" />
       </svg>
-      <div className={styles.chartLabel}><span>w = -1</span><b>loss curve</b><span>w = 8</span></div>
+      <div className={styles.chartLabel}><span>w = {W_MIN}</span><b>loss curve</b><span>w = {W_MAX}</span></div>
     </div>
   );
 }
@@ -49,10 +69,13 @@ export function GradientDescentLab() {
   const [currentStep, setCurrentStep] = useState(0);
   const [highestUnlocked, setHighestUnlocked] = useState(0);
   const [weight, setWeight] = useState(1);
-  const [probedLeft, setProbedLeft] = useState(false);
-  const [probedRight, setProbedRight] = useState(false);
-  const [newWeight, setNewWeight] = useState("");
-  const [updateChecked, setUpdateChecked] = useState(false);
+  const [probeDraft, setProbeDraft] = useState("");
+  const [probes, setProbes] = useState<Probe[]>([]);
+  const [probeError, setProbeError] = useState("");
+  const [direction, setDirection] = useState<"increase" | "decrease" | null>(null);
+  const [errorInput, setErrorInput] = useState("");
+  const [gradientInput, setGradientInput] = useState("");
+  const [updateInput, setUpdateInput] = useState("");
 
   function unlock(step: number) {
     setHighestUnlocked((current) => Math.max(current, step));
@@ -67,13 +90,57 @@ export function GradientDescentLab() {
     setCurrentStep(0);
     setHighestUnlocked(0);
     setWeight(1);
-    setProbedLeft(false);
-    setProbedRight(false);
-    setNewWeight("");
-    setUpdateChecked(false);
+    setProbeDraft("");
+    setProbes([]);
+    setProbeError("");
+    setDirection(null);
+    setErrorInput("");
+    setGradientInput("");
+    setUpdateInput("");
+  }
+
+  function addProbe() {
+    const value = Number(probeDraft);
+    if (probeDraft.trim() === "" || !Number.isFinite(value)) {
+      setProbeError("Type a number to probe.");
+      return;
+    }
+    if (value < W_MIN || value > W_MAX) {
+      setProbeError(`Stay between ${W_MIN} and ${W_MAX}.`);
+      return;
+    }
+    if (Math.abs(value - PROBE_ORIGIN) < 0.001) {
+      setProbeError(`w = ${PROBE_ORIGIN} is where we already are. Probe a different value.`);
+      return;
+    }
+    if (probes.some((probe) => Math.abs(probe.weight - value) < 0.001)) {
+      setProbeError("You already probed that value.");
+      return;
+    }
+    setProbes((current) => [...current, { weight: value, loss: loss(value) }]);
+    setProbeDraft("");
+    setProbeError("");
   }
 
   const currentLoss = loss(weight);
+  const lowestLoss = (candidates: Probe[]) => candidates.reduce<Probe | null>(
+    (best, probe) => (best === null || probe.loss < best.loss ? probe : best),
+    null,
+  );
+  const bestBelow = lowestLoss(probes.filter((probe) => probe.weight < PROBE_ORIGIN));
+  const bestAbove = lowestLoss(probes.filter((probe) => probe.weight > PROBE_ORIGIN));
+  const bothSidesProbed = bestBelow !== null && bestAbove !== null;
+  // Below w = 3 the loss is always worse, but a probe far above (w >= 7) overshoots the
+  // minimum and is worse too — so "increase" is only *evidenced* by a nearby probe.
+  const evidenceSupportsIncrease = bestAbove !== null && bestAbove.loss < loss(PROBE_ORIGIN);
+
+  const expectedError = error(PROBE_ORIGIN);
+  const expectedGradient = gradient(PROBE_ORIGIN);
+  const expectedUpdate = PROBE_ORIGIN - LEARNING_RATE * expectedGradient;
+  const errorDone = matches(errorInput, expectedError);
+  const gradientDone = errorDone && matches(gradientInput, expectedGradient);
+  const updateDone = gradientDone && matches(updateInput, expectedUpdate);
+
   let screen;
 
   if (currentStep === 0) {
@@ -91,8 +158,8 @@ export function GradientDescentLab() {
               <span>Drag the weight: w = {format(weight)}</span>
               <input
                 type="range"
-                min="-1"
-                max="8"
+                min={W_MIN}
+                max={W_MAX}
                 step="0.1"
                 value={weight}
                 onChange={(event) => {
@@ -117,56 +184,193 @@ export function GradientDescentLab() {
       </div>
     );
   } else if (currentStep === 1) {
-    const ready = probedLeft && probedRight;
     screen = (
       <div className={`screen-layout centered-screen ${styles.labScreen}`}>
         <QuestionPrompt
           eyebrow="Prototype · Direction from evidence"
-          title="At w = 3, which direction makes the loss smaller?"
-          lead="Do not pick an answer card. Probe both sides of the current value and compare the consequences."
+          title={`At w = ${PROBE_ORIGIN}, which direction makes the loss smaller?`}
+          lead="Choose your own test values on both sides of the current weight, then read your own evidence. Nothing here is pre-computed for you."
         />
         <div className={styles.panel}>
           <div className={styles.metricGrid}>
-            <div className={styles.metric}><small>current w</small><strong>3</strong></div>
-            <div className={styles.metric}><small>prediction</small><strong>6</strong></div>
-            <div className={styles.metric}><small>loss</small><strong>16</strong></div>
+            <div className={styles.metric}><small>current w</small><strong>{PROBE_ORIGIN}</strong></div>
+            <div className={styles.metric}><small>prediction</small><strong>{format(prediction(PROBE_ORIGIN))}</strong></div>
+            <div className={styles.metric}><small>loss</small><strong>{format(loss(PROBE_ORIGIN))}</strong></div>
           </div>
-          <div className={styles.probeRow}>
-            <button className={styles.probe} onClick={() => setProbedLeft(true)}>
-              <b>Probe w = 2.5</b><span>{probedLeft ? "prediction 5 · loss 25" : "See what happens to the loss"}</span>
-            </button>
-            <button className={styles.probe} onClick={() => setProbedRight(true)}>
-              <b>Probe w = 3.5</b><span>{probedRight ? "prediction 7 · loss 9" : "See what happens to the loss"}</span>
-            </button>
+
+          <div className={styles.probeForm}>
+            <label>
+              <span>Probe a weight of your choosing</span>
+              <input
+                className={styles.numberInput}
+                type="number"
+                step="0.1"
+                min={W_MIN}
+                max={W_MAX}
+                value={probeDraft}
+                placeholder="e.g. 3.5"
+                onChange={(event) => { setProbeDraft(event.target.value); setProbeError(""); }}
+                onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addProbe(); } }}
+                aria-label="Weight to probe"
+              />
+            </label>
+            <button className="secondary-button" onClick={addProbe}>Probe this value →</button>
           </div>
+          {probeError ? <p className={styles.probeError} role="alert">{probeError}</p> : null}
+
+          {probes.length > 0 ? (
+            <table className={styles.probeTable}>
+              <caption>Your measurements</caption>
+              <thead>
+                <tr><th scope="col">w</th><th scope="col">prediction</th><th scope="col">loss</th><th scope="col">vs. 16</th></tr>
+              </thead>
+              <tbody>
+                {probes.map((probe) => (
+                  <tr key={probe.weight}>
+                    <td>{format(probe.weight)}</td>
+                    <td>{format(prediction(probe.weight))}</td>
+                    <td>{format(probe.loss)}</td>
+                    <td className={probe.loss < loss(PROBE_ORIGIN) ? styles.better : styles.worse}>
+                      {probe.loss < loss(PROBE_ORIGIN) ? "lower" : "higher"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
+
+          <p className={styles.labNote}>
+            {bothSidesProbed
+              ? "You have evidence on both sides. Commit to a direction."
+              : `Probe at least one value below ${PROBE_ORIGIN} and one above it.`}
+          </p>
         </div>
-        {ready ? (
-          <Feedback tone="success"><div><b>The evidence gives us a direction.</b><span>Moving right reduced loss from 16 to 9; moving left increased it to 25. A gradient will eventually encode this local direction numerically.</span></div><button className="primary-button" onClick={() => { unlock(2); setCurrentStep(2); }}>Try one numeric update →</button></Feedback>
+
+        {bothSidesProbed ? (
+          <div className={styles.directionBlock}>
+            <h3 className={styles.directionQuestion}>Based on your own measurements, which way should w move?</h3>
+            <div className={styles.directionActions}>
+              <button className={direction === "decrease" ? "primary-button" : "secondary-button"} onClick={() => setDirection("decrease")}>Decrease w</button>
+              <button className={direction === "increase" ? "primary-button" : "secondary-button"} onClick={() => setDirection("increase")}>Increase w</button>
+            </div>
+            {direction === "decrease" && bestBelow !== null ? (
+              <Feedback tone="nudge">
+                Read your own row again: w = {format(bestBelow.weight)} gave a loss of {format(bestBelow.loss)}, which is worse than the {format(loss(PROBE_ORIGIN))} you started with.
+              </Feedback>
+            ) : null}
+            {direction === "increase" && bestAbove !== null && bestBelow !== null && !evidenceSupportsIncrease ? (
+              <Feedback tone="nudge">
+                Every value you tried is worse than 16, on both sides — including w = {format(bestAbove.weight)} at a loss of {format(bestAbove.loss)}.
+                You have stepped clean over the bottom of the curve. Probe something closer to {PROBE_ORIGIN} and look again.
+              </Feedback>
+            ) : null}
+            {direction === "increase" && evidenceSupportsIncrease && bestAbove !== null && bestBelow !== null ? (
+              <Feedback tone="success">
+                <div>
+                  <b>Your measurements point right.</b>
+                  <span>
+                    You measured a lower loss above {PROBE_ORIGIN} ({format(bestAbove.weight)} → {format(bestAbove.loss)}) and a higher one below it
+                    ({format(bestBelow.weight)} → {format(bestBelow.loss)}). A gradient encodes exactly this local direction as a single number.
+                  </span>
+                </div>
+                <button className="primary-button" onClick={() => { unlock(2); setCurrentStep(2); }}>Derive that number →</button>
+              </Feedback>
+            ) : null}
+          </div>
         ) : null}
       </div>
     );
   } else if (currentStep === 2) {
-    const numeric = Number(newWeight);
-    const correct = updateChecked && Number.isFinite(numeric) && Math.abs(numeric - 4.6) < .001;
     screen = (
       <div className={`screen-layout centered-screen ${styles.labScreen}`}>
         <QuestionPrompt
-          eyebrow="Prototype · Symbolic + numeric"
-          title="Can the learner execute one gradient update instead of recognizing it?"
-          lead="Assume a later lesson has derived gradient = −16. Use the update rule yourself with learning rate 0.1."
+          eyebrow="Prototype · Multi-step derivation"
+          title="Can the learner derive the gradient rather than be handed it?"
+          lead={`Work down the chain at w = ${PROBE_ORIGIN}. Each line unlocks only when the one above it is right — nothing is pre-filled.`}
         />
         <div className={styles.equationCard}>
-          <div className={styles.equation}>
-            <span>wₙₑw = 3 − 0.1 × (−16) =</span>
-            <input className={styles.numberInput} type="number" step="0.1" value={newWeight} onChange={(event) => { setNewWeight(event.target.value); setUpdateChecked(false); }} aria-label="New weight" />
+          <div className={styles.formula}>
+            prediction = x × w&nbsp;&nbsp;(x = {X_VALUE}, target = {TARGET})<br />
+            loss = (prediction − target)²<br />
+            d(loss)/dw = 2 × error × x
           </div>
-          <button className="primary-button" disabled={!newWeight.trim()} onClick={() => setUpdateChecked(true)}>Check the update →</button>
-          {updateChecked && !correct ? <Feedback tone="nudge">Apply the signs carefully: subtracting a negative value moves w upward.</Feedback> : null}
-          {correct ? (
+
+          <div className={styles.derivationRow}>
+            <span className={styles.derivationStep}>1</span>
+            <div className={styles.equation}>
+              <span>error = ({X_VALUE} × {PROBE_ORIGIN}) − {TARGET} =</span>
+              <input
+                className={styles.numberInput}
+                type="number"
+                step="0.1"
+                value={errorInput}
+                onChange={(event) => setErrorInput(event.target.value)}
+                aria-label="Error at w = 3"
+              />
+              {errorDone ? <b className={styles.tick}>✓</b> : null}
+            </div>
+          </div>
+
+          {errorDone ? (
+            <div className={styles.derivationRow}>
+              <span className={styles.derivationStep}>2</span>
+              <div className={styles.equation}>
+                <span>gradient = 2 × ({format(expectedError)}) × {X_VALUE} =</span>
+                <input
+                  className={styles.numberInput}
+                  type="number"
+                  step="0.1"
+                  value={gradientInput}
+                  onChange={(event) => setGradientInput(event.target.value)}
+                  aria-label="Gradient at w = 3"
+                />
+                {gradientDone ? <b className={styles.tick}>✓</b> : null}
+              </div>
+            </div>
+          ) : null}
+
+          {gradientDone ? (
+            <div className={styles.derivationRow}>
+              <span className={styles.derivationStep}>3</span>
+              <div className={styles.equation}>
+                <span>wₙₑw = {PROBE_ORIGIN} − {LEARNING_RATE} × ({format(expectedGradient)}) =</span>
+                <input
+                  className={styles.numberInput}
+                  type="number"
+                  step="0.1"
+                  value={updateInput}
+                  onChange={(event) => setUpdateInput(event.target.value)}
+                  aria-label="Updated weight"
+                />
+                {updateDone ? <b className={styles.tick}>✓</b> : null}
+              </div>
+            </div>
+          ) : null}
+
+          {errorInput.trim() !== "" && !errorDone ? (
+            <Feedback tone="nudge">The prediction at w = {PROBE_ORIGIN} is {format(prediction(PROBE_ORIGIN))}, and the target is {TARGET}. An undershoot gives a negative error.</Feedback>
+          ) : null}
+          {errorDone && gradientInput.trim() !== "" && !gradientDone ? (
+            <Feedback tone="nudge">Multiply all three factors, signs included: 2 × {format(expectedError)} × {X_VALUE}.</Feedback>
+          ) : null}
+          {gradientDone && updateInput.trim() !== "" && !updateDone ? (
+            <Feedback tone="nudge">Apply the signs carefully: subtracting a negative value moves w upward.</Feedback>
+          ) : null}
+
+          {updateDone ? (
             <>
-              <Feedback tone="success"><div><b>Correct: w becomes 4.6.</b><span>One update cuts the loss from 16 to 0.64. This interaction combines algebra, numeric entry, and a visible consequence.</span></div></Feedback>
+              <Feedback tone="success">
+                <div>
+                  <b>You derived the gradient and used it.</b>
+                  <span>
+                    The sign of {format(expectedGradient)} agrees with the probing you did by hand, and its size sets how far one step travels.
+                  </span>
+                </div>
+              </Feedback>
               <div className={styles.resultStrip}>
-                <div><small>before</small><b>w = 3 · loss = 16</b></div><span>→</span><div><small>after</small><b>w = 4.6 · loss = 0.64</b></div>
+                <div><small>before</small><b>w = {PROBE_ORIGIN} · loss = {format(loss(PROBE_ORIGIN))}</b></div>
+                <span>→</span>
+                <div><small>after</small><b>w = {format(expectedUpdate)} · loss = {format(loss(expectedUpdate))}</b></div>
               </div>
               <button className="primary-button" onClick={() => { unlock(3); setCurrentStep(3); }}>Finish prototype →</button>
             </>
@@ -179,8 +383,9 @@ export function GradientDescentLab() {
       <div className="screen-layout complete-screen">
         <div className="completion-mark">✓</div>
         <p className="eyebrow">Interaction prototype complete</p>
-        <h2>The lesson shell can carry continuous and symbolic work.</h2>
-        <p className="lead completion-lead">The prototype used a live numeric scrubber, a loss curve, experimental probing, and explicit equation entry. Phase 4 should build on these interaction types rather than forcing gradients into ChoiceCards.</p>
+        <h2>The lesson shell can carry continuous and multi-step numeric work.</h2>
+        <p className="lead completion-lead">The prototype used a live numeric scrubber, a loss curve, learner-chosen measurements, and a three-line derivation with no value handed over. Phase 4 should build on these interaction types rather than forcing gradients into ChoiceCards.</p>
+        <p className={styles.labNote}>Still untested: symbolic manipulation, where the learner rearranges an expression rather than evaluating one. That remains an open R&amp;D checkpoint.</p>
         <button className="primary-button" onClick={restart}>Replay the prototype</button>
       </div>
     );
@@ -188,7 +393,7 @@ export function GradientDescentLab() {
 
   return (
     <LessonPlayer
-      lessonNumber={0}
+      kicker="Interaction lab"
       title="Lab: can this format teach gradient descent?"
       stepLabels={STEP_LABELS}
       currentStep={currentStep}

@@ -17,12 +17,12 @@ import { MixedChallengeStep } from "./steps/MixedChallenge";
 import { PrivateFixStep } from "./steps/PrivateFix";
 import { ProveAsciiStep } from "./steps/ProveAscii";
 import { WorldTextStep } from "./steps/WorldText";
+import type { RecallAssessment } from "../../components/ui/TextRecall";
 import type {
   BiggerAnswer,
   BreakingAsciiPersistedState,
   MissingAnswer,
   MixedAnswer,
-  PrivateFixAnswer,
 } from "./types";
 
 const STEP_COUNT = BREAK_ASCII_STEPS.length;
@@ -38,13 +38,6 @@ function safeMixedAnswers(value: unknown): MixedAnswer[] {
   return value.map((item) => item === "ascii" || item === "outside" ? item : null);
 }
 
-function isSharedAgreementRecall(value: string) {
-  const text = value.toLowerCase().replace(/[’']/g, "'");
-  const pointsToSharedKnowledge = /(shared|same|agree|agreement|both|receiver|computer 2|other computer|doesn't know|does not know)/.test(text);
-  const pointsToInterpretation = /(rule|mapping|table|meaning|mean|interpret|know|understand)/.test(text);
-  return pointsToSharedKnowledge && pointsToInterpretation;
-}
-
 export function BreakingAsciiLesson() {
   const [hasHydrated, setHasHydrated] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -54,8 +47,9 @@ export function BreakingAsciiLesson() {
   const [missingAnswer, setMissingAnswer] = useState<MissingAnswer>(null);
   const [privateAssigned, setPrivateAssigned] = useState(false);
   const [privateSent, setPrivateSent] = useState(false);
-  const [privateFixAnswer, setPrivateFixAnswer] = useState<PrivateFixAnswer>(null);
   const [privateRecallText, setPrivateRecallText] = useState("");
+  const [privateRecallCommitted, setPrivateRecallCommitted] = useState(false);
+  const [privateRecallAssessment, setPrivateRecallAssessment] = useState<RecallAssessment>(null);
   const [worldSeenIds, setWorldSeenIds] = useState<string[]>([]);
   const [includedAreas, setIncludedAreas] = useState<string[]>([]);
   const [biggerAnswer, setBiggerAnswer] = useState<BiggerAnswer>(null);
@@ -82,14 +76,18 @@ export function BreakingAsciiLesson() {
     setMissingAnswer(saved?.missingAnswer === "hidden" || saved?.missingAnswer === "missing" || saved?.missingAnswer === "binary" ? saved.missingAnswer : null);
     setPrivateAssigned(saved?.privateAssigned === true);
     setPrivateSent(saved?.privateSent === true);
-    setPrivateFixAnswer(
-      saved?.privateFixAnswer === "agreement" || saved?.privateFixAnswer === "needs-work"
-        ? saved.privateFixAnswer
-        : saved?.privateFixAnswer === "size" || saved?.privateFixAnswer === "binary"
-          ? "needs-work"
+    // Learners who already cleared the old machine-graded check keep their progress;
+    // anyone who was mid-attempt restarts the recall with a clean slate.
+    const clearedLegacyCheck = saved?.privateFixAnswer === "agreement";
+    setPrivateRecallText(typeof saved?.privateRecallText === "string" ? saved.privateRecallText : "");
+    setPrivateRecallCommitted(saved?.privateRecallCommitted === true || clearedLegacyCheck);
+    setPrivateRecallAssessment(
+      saved?.privateRecallAssessment === "matched" || saved?.privateRecallAssessment === "missed"
+        ? saved.privateRecallAssessment
+        : clearedLegacyCheck
+          ? "matched"
           : null,
     );
-    setPrivateRecallText(typeof saved?.privateRecallText === "string" ? saved.privateRecallText : "");
     setWorldSeenIds(safeStringArray(saved?.worldSeenIds, WORLD_SAMPLES.map((sample) => sample.id)));
     setIncludedAreas(safeStringArray(saved?.includedAreas, EXPANSION_AREAS));
     setBiggerAnswer(saved?.biggerAnswer === "private" || saved?.biggerAnswer === "shared" || saved?.biggerAnswer === "guess" ? saved.biggerAnswer : null);
@@ -108,15 +106,16 @@ export function BreakingAsciiLesson() {
       missingAnswer,
       privateAssigned,
       privateSent,
-      privateFixAnswer,
       privateRecallText,
+      privateRecallCommitted,
+      privateRecallAssessment,
       worldSeenIds,
       includedAreas,
       biggerAnswer,
       mixedAnswers,
     };
     writePersistedLessonState(BREAK_ASCII_STORAGE_KEY, state);
-  }, [hasHydrated, currentStep, highestUnlocked, asciiProofSent, cafeTried, missingAnswer, privateAssigned, privateSent, privateFixAnswer, privateRecallText, worldSeenIds, includedAreas, biggerAnswer, mixedAnswers]);
+  }, [hasHydrated, currentStep, highestUnlocked, asciiProofSent, cafeTried, missingAnswer, privateAssigned, privateSent, privateRecallText, privateRecallCommitted, privateRecallAssessment, worldSeenIds, includedAreas, biggerAnswer, mixedAnswers]);
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -155,8 +154,9 @@ export function BreakingAsciiLesson() {
     setMissingAnswer(null);
     setPrivateAssigned(false);
     setPrivateSent(false);
-    setPrivateFixAnswer(null);
     setPrivateRecallText("");
+    setPrivateRecallCommitted(false);
+    setPrivateRecallAssessment(null);
     setWorldSeenIds([]);
     setIncludedAreas([]);
     setBiggerAnswer(null);
@@ -188,16 +188,15 @@ export function BreakingAsciiLesson() {
         <PrivateFixStep
           assigned={privateAssigned}
           sent={privateSent}
-          answer={privateFixAnswer}
           recallText={privateRecallText}
+          recallCommitted={privateRecallCommitted}
+          recallAssessment={privateRecallAssessment}
           onAssign={() => setPrivateAssigned(true)}
           onSend={() => setPrivateSent(true)}
-          onRecallChange={(value) => { setPrivateRecallText(value); if (privateFixAnswer !== "agreement") setPrivateFixAnswer(null); }}
-          onRecallSubmit={(value) => {
-            const correct = isSharedAgreementRecall(value);
-            setPrivateFixAnswer(correct ? "agreement" : "needs-work");
-            if (correct) unlock(3);
-          }}
+          onRecallChange={setPrivateRecallText}
+          onRecallCommit={() => setPrivateRecallCommitted(true)}
+          onRecallAssess={(assessment) => { setPrivateRecallAssessment(assessment); unlock(3); }}
+          onRecallRewrite={() => { setPrivateRecallCommitted(false); setPrivateRecallAssessment(null); }}
           onContinue={() => unlockAndGo(3)}
         />
       );

@@ -73,7 +73,7 @@ Five lessons have now established a few stable repeated responsibilities. It is 
 - `QuestionPrompt` for dominant teaching questions;
 - `ChoiceCard` for genuine prediction/mental-model choices;
 - `Feedback` for consequence-focused nudges and success;
-- `TextRecall` for learner-produced recall.
+- `TextRecall` for learner-produced recall (commit → reveal → self-assess; never machine-graded).
 
 Do not encode lesson pedagogy as JSON or force every step into one component signature. Extract stable responsibilities, not the lesson itself.
 
@@ -143,6 +143,29 @@ Good retrieval forms:
 - calculate with a rule learned earlier;
 - diagnose a new failure using an old mental model;
 - rebuild a prior result without showing the original table/answer.
+
+### Never machine-grade free-text recall
+
+Prose recall must use the commit → reveal → self-assess loop that `TextRecall`
+implements: the learner writes an answer, commits it, and only then sees the canonical
+principle beside what they wrote and judges their own recall. Either self-assessment
+unlocks the next screen.
+
+Do **not** gate progress on keyword or regex matching of a learner's sentence. It fails
+in both directions — it rejects correct answers phrased in unexpected words and accepts
+any sentence containing the expected ones — and it teaches learners to guess the author's
+vocabulary, which is a worse version of the multiple-choice tell above because the target
+is invisible. The retention benefit of retrieval comes from committing to an answer
+before the reveal, not from being scored.
+
+A learner can self-report generously. That is an accepted cost: the alternative is a
+grader that lies about understanding prose. When a check genuinely must be verified by
+the machine, make it a **construction** with a determinate answer — reconstruct a pipeline
+from blank slots, calculate with an earlier rule, produce the number — not prose.
+
+Do not remove the scaffolding lesson: a recall prompt should not name the answer's subject
+or seed its first words in the placeholder. Ask what the earlier lesson proved; do not
+hand back most of the sentence.
 
 ### Questions must win the visual hierarchy
 
