@@ -1,33 +1,42 @@
 "use client";
 
-import { ChoiceCard } from "../../../components/ui/ChoiceCard";
-import { Feedback } from "../../../components/ui/Feedback";
-import type { PrivateFixAnswer } from "../types";
+import { QuestionPrompt } from "../../../components/ui/QuestionPrompt";
+import { TextRecall, type RecallAssessment } from "../../../components/ui/TextRecall";
 
 export function PrivateFixStep({
   assigned,
   sent,
-  answer,
+  recallText,
+  recallCommitted,
+  recallAssessment,
   onAssign,
   onSend,
-  onAnswer,
+  onRecallChange,
+  onRecallCommit,
+  onRecallAssess,
+  onRecallRewrite,
   onContinue,
 }: {
   assigned: boolean;
   sent: boolean;
-  answer: PrivateFixAnswer;
+  recallText: string;
+  recallCommitted: boolean;
+  recallAssessment: RecallAssessment;
   onAssign: () => void;
   onSend: () => void;
-  onAnswer: (answer: Exclude<PrivateFixAnswer, null>) => void;
+  onRecallChange: (value: string) => void;
+  onRecallCommit: () => void;
+  onRecallAssess: (assessment: Exclude<RecallAssessment, null>) => void;
+  onRecallRewrite: () => void;
   onContinue: () => void;
 }) {
   return (
     <div className="screen-layout centered-screen wide-screen l4-screen">
-      <div className="screen-copy centered-copy compact-copy">
-        <p className="eyebrow">Step 3 · Try a private fix</p>
-        <h2>Can we just invent é → 200 ourselves?</h2>
-        <p className="lead">Computer 1 is free to write down a private rule. The real test is whether Computer 2 can recover the same character.</p>
-      </div>
+      <QuestionPrompt
+        eyebrow="Step 3 · Try a private fix"
+        title="Can we just invent é → 200 ourselves?"
+        lead="Computer 1 is free to write down a private rule. The real test is whether Computer 2 can recover the same character."
+      />
 
       <div className="l4-private-lab">
         <div className="card l4-machine-card">
@@ -49,27 +58,23 @@ export function PrivateFixStep({
         <button className="primary-button l4-main-action" onClick={onSend}>Send 200 to Computer 2 →</button>
       ) : (
         <div className="l4-question-block">
-          <h3 className="l4-decision-question">Why didn&apos;t this restore communication?</h3>
-          <div className="l4-choice-grid">
-            <ChoiceCard variant="large" selected={answer === "size"} onClick={() => onAnswer("size")}>
-              <b>200 is outside ASCII</b><span>The only issue is that we picked a value larger than 127.</span>
-            </ChoiceCard>
-            <ChoiceCard variant="large" selected={answer === "agreement"} onClick={() => onAnswer("agreement")}>
-              <b>The receiver never agreed</b><span>A private mapping on the sender does not create a shared interpretation.</span>
-            </ChoiceCard>
-            <ChoiceCard variant="large" selected={answer === "binary"} onClick={() => onAnswer("binary")}>
-              <b>Binary cannot hold 200</b><span>The number itself cannot be represented with bits.</span>
-            </ChoiceCard>
-          </div>
+          <h3 className="l4-decision-question">Without looking back: what did Lesson 02 prove about a number travelling between two machines?</h3>
+          <TextRecall
+            label="Write the principle in your own words."
+            value={recallText}
+            placeholder="One sentence is enough."
+            principle="A number only communicates a character when both machines already share the mapping that gives that number its meaning. A rule written on one side is not an agreement."
+            committed={recallCommitted}
+            assessment={recallAssessment}
+            onChange={onRecallChange}
+            onCommit={onRecallCommit}
+            onAssess={onRecallAssess}
+            onRewrite={onRecallRewrite}
+          />
 
-          {answer === "size" && <Feedback tone="nudge">200 is indeed outside ASCII. But choosing a different number still would not make a private rule shared. Computer 2 needs the same published mapping.</Feedback>}
-          {answer === "binary" && <Feedback tone="nudge">Bits can represent 200. The problem is interpretation: Computer 2 has no shared rule saying that 200 means é.</Feedback>}
-          {answer === "agreement" && (
-            <Feedback tone="success">
-              <div><b>Exactly.</b><span>We rediscovered Lesson 02: inventing a number locally is not enough. A new character needs a shared assignment that everyone can know.</span></div>
-              <button className="primary-button" onClick={onContinue}>See how large the problem is →</button>
-            </Feedback>
-          )}
+          {recallAssessment !== null ? (
+            <button className="primary-button l4-main-action" onClick={onContinue}>See how large the problem is →</button>
+          ) : null}
         </div>
       )}
     </div>

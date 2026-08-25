@@ -7,7 +7,9 @@ import { LessonProgress } from "./LessonProgress";
 import { LessonStage } from "./LessonStage";
 
 export type LessonPlayerProps = {
-  lessonNumber: number;
+  lessonNumber?: number;
+  /** Replaces the "Lesson NN" rail label, e.g. for interaction labs. */
+  kicker?: string;
   title: string;
   stepLabels: string[];
   currentStep: number;
@@ -21,6 +23,7 @@ export type LessonPlayerProps = {
 
 export function LessonPlayer({
   lessonNumber,
+  kicker,
   title,
   stepLabels,
   currentStep,
@@ -36,6 +39,7 @@ export function LessonPlayer({
       <LessonHeader onRestart={onRestart} />
       <LessonProgress
         lessonNumber={lessonNumber}
+        kicker={kicker}
         title={title}
         stepLabels={stepLabels}
         currentStep={currentStep}

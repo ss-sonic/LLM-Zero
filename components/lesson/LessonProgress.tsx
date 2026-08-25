@@ -3,7 +3,10 @@
 import { canAccessStep } from "../../lib/lesson/progress";
 
 export type LessonProgressProps = {
-  lessonNumber: number;
+  /** Omit together with `kicker` only if the rail should read "Lesson 00". */
+  lessonNumber?: number;
+  /** Overrides the "Lesson NN" label — labs are not lessons. */
+  kicker?: string;
   title: string;
   stepLabels: string[];
   currentStep: number;
@@ -13,6 +16,7 @@ export type LessonProgressProps = {
 
 export function LessonProgress({
   lessonNumber,
+  kicker,
   title,
   stepLabels,
   currentStep,
@@ -22,7 +26,7 @@ export function LessonProgress({
   return (
     <nav className="lesson-progress" aria-label="Lesson progress">
       <div className="progress-copy">
-        <span>Lesson {String(lessonNumber).padStart(2, "0")}</span>
+        <span>{kicker ?? `Lesson ${String(lessonNumber ?? 0).padStart(2, "0")}`}</span>
         <b>{title}</b>
       </div>
       <div className="progress-track">

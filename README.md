@@ -28,6 +28,13 @@ The next lessons cover shared character tables, ASCII, breaking ASCII, Unicode, 
 
 See [`ROADMAP.md`](./ROADMAP.md) for the full path.
 
+## Interaction labs
+
+`/labs/*` holds interaction prototypes that test whether the learning format can carry a
+future concept before that concept enters the curriculum. Labs are routable but
+deliberately unlinked from the course map: they are not lessons and are not
+prerequisites. The current one is `/labs/gradient-descent`.
+
 ## Repository architecture
 
 ```text
@@ -35,6 +42,7 @@ app/                         routes, metadata, course home
 components/lesson/           reusable guided-lesson shell
 components/ui/               small proven UI primitives
 curriculum/                  lesson content and experiments
+labs/                        interaction prototypes (not curriculum)
   01-character-representation/
     lesson.tsx
     config.ts
