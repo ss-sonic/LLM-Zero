@@ -192,6 +192,16 @@ Large type should create hierarchy without crowding the experiment off-screen. O
 - Do not force every lesson prompt into the same oversized display treatment.
 - Check both width and vertical pressure on short laptop screens and mobile.
 
+### Use the lesson canvas, not just its center
+
+A one-screen lesson should feel composed across the available canvas, not like a compact card stack floating at 50% of a tall viewport.
+
+- On tall desktop/laptop viewports, inspect how much of the lesson stage the prompt → experiment → action sequence actually occupies.
+- If a short screen uses substantially less than the available stage height, give that lesson a deliberate vertical composition (for example a bounded minimum screen height and top-biased rhythm) instead of blindly inheriting center alignment.
+- Do not add filler copy or giant headings merely to occupy space. Use spacing to clarify hierarchy between question, evidence, action, and feedback.
+- Expanded states may become taller than initial states; they must grow naturally and remain scrollable rather than being squeezed to preserve artificial symmetry.
+- Recheck both the shortest initial state and the tallest revealed/success state. A layout that looks balanced only after the learner has answered is still broken.
+
 Decorative motion is secondary. Respect `prefers-reduced-motion`.
 
 ## 8. Build an interaction vocabulary that can survive the hard half
@@ -278,7 +288,7 @@ Before marking a lesson available:
 - persist only state needed to meaningfully resume;
 - make Back/Forward and refresh safe;
 - check the north-star connection without teaching future vocabulary;
-- test keyboard and mobile behavior;
+- test tall desktop, short laptop, keyboard, and mobile behavior;
 - run `npm run lint` and `npm run build`;
 - update `ROADMAP.md` when lesson status or prerequisites change.
 
