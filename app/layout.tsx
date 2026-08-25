@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./binary.css";
+import "./viewport.css";
 
 export const metadata: Metadata = {
   title: "LLM Zero — Learn LLMs from First Principles",
