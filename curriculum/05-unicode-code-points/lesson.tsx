@@ -46,7 +46,7 @@ function isInventedTable(value: unknown): value is InventedTable {
 
 function safeSeenIds(value: unknown) {
   if (!Array.isArray(value)) return [UNICODE_EXAMPLES[0].id];
-  const allowed = UNICODE_EXAMPLES.map((example) => example.id);
+  const allowed: readonly string[] = UNICODE_EXAMPLES.map((example) => example.id);
   const filtered = value.filter((item): item is string => typeof item === "string" && allowed.includes(item));
   return filtered.length ? Array.from(new Set(filtered)) : [UNICODE_EXAMPLES[0].id];
 }
@@ -75,7 +75,7 @@ export function UnicodeCodePointLesson() {
   const [codePointAnswer, setCodePointAnswer] = useState<CodePointAnswer>(null);
   const [unicodeRevealed, setUnicodeRevealed] = useState(false);
   const [notationSeenIds, setNotationSeenIds] = useState<string[]>([UNICODE_EXAMPLES[0].id]);
-  const [notationSelectedId, setNotationSelectedId] = useState(UNICODE_EXAMPLES[0].id);
+  const [notationSelectedId, setNotationSelectedId] = useState<string>(UNICODE_EXAMPLES[0].id);
   const [storageAnswer, setStorageAnswer] = useState<StorageAnswer>(null);
   const [challengeMatches, setChallengeMatches] = useState<ChallengeMatches>(Array.from({ length: CHALLENGE_LENGTH }, () => null));
   const [finalConceptAnswer, setFinalConceptAnswer] = useState<FinalConceptAnswer>(null);
