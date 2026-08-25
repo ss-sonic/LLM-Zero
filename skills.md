@@ -115,6 +115,16 @@ Do not reveal the conclusion in a headline before the learner has had a chance t
 
 If an interaction creates a new decision halfway through a screen, give that new question fresh visual emphasis instead of reusing a tiny helper label.
 
+### Typography serves the lesson, not the poster
+
+Large type should create hierarchy without crowding the experiment off-screen. On a normal laptop, aim for a primary teaching prompt to occupy roughly one to three balanced lines; four-line display headlines should be exceptional.
+
+- Prefer tightening verbose prompt copy before shrinking it dramatically.
+- Use balanced wrapping for prominent headings where supported.
+- Short emotional statements may be larger than long reasoning questions.
+- Do not force every lesson prompt into the same oversized display treatment.
+- Check both width and vertical pressure on short laptop screens and mobile.
+
 Decorative motion is secondary. Respect `prefers-reduced-motion`.
 
 ## 8. Accessibility and responsive behavior are part of correctness
