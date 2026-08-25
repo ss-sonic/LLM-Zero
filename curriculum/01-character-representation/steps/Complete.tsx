@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { toBits } from "../../../lib/lesson/binary";
 
 export function CompleteStep({
@@ -28,9 +29,9 @@ export function CompleteStep({
         <div>
           <small>Next mystery</small>
           <h3>What if every computer invents its own table?</h3>
-          <p>That problem is why shared character standards had to exist.</p>
+          <p>Find out why representation is not enough unless both sides interpret it the same way.</p>
         </div>
-        <span className="locked-pill">🔒 Lesson 02 · Shared character table</span>
+        <Link className="primary-button" href="/lessons/shared-character-table">Start Lesson 02 →</Link>
       </div>
 
       <button className="text-link-button" onClick={onRestart}>Replay this lesson</button>

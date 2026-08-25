@@ -5,7 +5,7 @@ LLM Zero grows from the smallest representation concepts toward complete languag
 ## Phase 1 — Text becomes data
 
 - [x] Lesson 01 — How can the letter A exist inside a computer?
-- [ ] Lesson 02 — Why do computers need a shared character table?
+- [x] Lesson 02 — Why do computers need a shared character table?
 - [ ] Lesson 03 — ASCII: one early shared agreement
 - [ ] Lesson 04 — Break ASCII with the world's languages
 - [ ] Lesson 05 — Unicode and code points
@@ -55,17 +55,17 @@ LLM Zero grows from the smallest representation concepts toward complete languag
 - [ ] Causal masking
 - [ ] Multi-head attention
 
-## Phase 6 — Build a transformer
+## Phase 6 — Build the Transformer
 
 - [ ] Positional information
-- [ ] Attention blocks
-- [ ] MLP blocks
+- [ ] Transformer blocks
+- [ ] Feed-forward / MLP layers
 - [ ] Residual connections
 - [ ] Normalization
-- [ ] Assemble a tiny decoder-only transformer
-- [ ] Train it on a small corpus
+- [ ] Build a tiny decoder-only transformer
+- [ ] Train it end-to-end
 
-## Phase 7 — How real LLM systems work
+## Phase 7 — From model to real system
 
 - [ ] Next-token prediction
 - [ ] Cross-entropy loss
@@ -76,6 +76,4 @@ LLM Zero grows from the smallest representation concepts toward complete languag
 - [ ] Quantization
 - [ ] Fine-tuning
 - [ ] Distributed training
-- [ ] Inference engines and serving
-
-This roadmap is directional, not immutable. Lessons should be reordered when learner testing reveals a better dependency chain.
+- [ ] Inference and serving

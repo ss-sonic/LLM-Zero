@@ -19,8 +19,8 @@ export function QuestionRuleStep({
     <div className="screen-layout centered-screen">
       <div className="screen-copy centered-copy">
         <p className="eyebrow">Step 3 · Question the rule</p>
-        <h2>You chose <span className="inline-token">A → {agreedNumber}</span></h2>
-        <p className="lead">Is {agreedNumber} somehow naturally connected to the letter A?</p>
+        <h2>Is {agreedNumber} somehow naturally connected to the letter A?</h2>
+        <p className="lead">You chose <span className="inline-token">A → {agreedNumber}</span>. Decide whether that number contains something about A, or whether it only means A because of the rule you invented.</p>
       </div>
       <div className="binary-choice-row">
         <ChoiceCard variant="large" selected={answer === "yes"} onClick={() => onAnswer("yes")}>

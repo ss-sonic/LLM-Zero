@@ -3,6 +3,10 @@ import {
   CHARACTER_REPRESENTATION_STEPS,
   CHARACTER_REPRESENTATION_STORAGE_KEY,
 } from "./01-character-representation/config";
+import {
+  SHARED_CHARACTER_TABLE_STEPS,
+  SHARED_CHARACTER_TABLE_STORAGE_KEY,
+} from "./02-shared-character-table/config";
 
 export const LESSONS: LessonMeta[] = [
   {
@@ -25,7 +29,11 @@ export const LESSONS: LessonMeta[] = [
     question: "What if every computer invents its own table?",
     description: "Experience why communication breaks when two machines disagree about what a number means.",
     module: "Text becomes data",
-    status: "coming-soon",
+    status: "available",
+    progress: {
+      storageKey: SHARED_CHARACTER_TABLE_STORAGE_KEY,
+      stepCount: SHARED_CHARACTER_TABLE_STEPS.length,
+    },
   },
   {
     number: 3,
