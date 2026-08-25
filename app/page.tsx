@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 
-const PRESETS = [
-  { symbol: "A", label: "Letter A" },
-  { symbol: "B", label: "Letter B" },
-  { symbol: "?", label: "Question mark" },
-  { symbol: "♥", label: "Heart" },
+const STEP_LABELS = [
+  "The mystery",
+  "Invent a rule",
+  "Is the number special?",
+  "Break the agreement",
+  "See the bits",
+  "Prove the idea",
+  "Complete",
 ];
 
 function toBits(value: number) {
@@ -18,270 +21,397 @@ function bitsToNumber(bits: string[]) {
 }
 
 export default function Home() {
-  const [symbol, setSymbol] = useState("A");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [highestUnlocked, setHighestUnlocked] = useState(0);
+  const [introGuess, setIntroGuess] = useState<string | null>(null);
+  const [numberDraft, setNumberDraft] = useState("65");
   const [agreedNumber, setAgreedNumber] = useState(65);
-  const [bits, setBits] = useState(() => toBits(65));
-  const [receiverMap, setReceiverMap] = useState(65);
-  const [prediction, setPrediction] = useState<"same" | "different" | null>(null);
-  const [revealed, setRevealed] = useState(false);
+  const [conventionAnswer, setConventionAnswer] = useState<"yes" | "no" | null>(null);
+  const [sendRevealed, setSendRevealed] = useState(false);
+  const [labBits, setLabBits] = useState(() => toBits(65));
+  const [hasFlippedBit, setHasFlippedBit] = useState(false);
+  const [finalAnswer, setFinalAnswer] = useState<"letter" | "representation" | null>(null);
 
-  const bitNumber = useMemo(() => bitsToNumber(bits), [bits]);
-  const decoded = bitNumber === receiverMap ? symbol : "?";
+  const labNumber = useMemo(() => bitsToNumber(labBits), [labBits]);
+  const receiverSymbol = "G";
 
-  function chooseSymbol(next: string) {
-    setSymbol(next);
-    setPrediction(null);
-    setRevealed(false);
+  function unlock(step: number) {
+    setHighestUnlocked((current) => Math.max(current, step));
   }
 
-  function updateNumber(next: number) {
-    const safe = Math.max(0, Math.min(255, Number.isFinite(next) ? next : 0));
+  function goTo(step: number) {
+    if (step <= highestUnlocked) setCurrentStep(step);
+  }
+
+  function unlockAndGo(step: number) {
+    unlock(step);
+    setCurrentStep(step);
+  }
+
+  function commitNumber() {
+    const parsed = Number(numberDraft);
+    if (!Number.isFinite(parsed)) return;
+    const safe = Math.max(0, Math.min(255, Math.round(parsed)));
     setAgreedNumber(safe);
-    setBits(toBits(safe));
-    setReceiverMap(safe);
-    setPrediction(null);
-    setRevealed(false);
+    setNumberDraft(String(safe));
+    setLabBits(toBits(safe));
+    setHasFlippedBit(false);
+    setSendRevealed(false);
+    setConventionAnswer(null);
+    unlockAndGo(2);
   }
 
   function flipBit(index: number) {
-    setBits((current) => current.map((bit, i) => (i === index ? (bit === "0" ? "1" : "0") : bit)));
-    setPrediction(null);
-    setRevealed(false);
+    setLabBits((current) => current.map((bit, bitIndex) => (
+      bitIndex === index ? (bit === "0" ? "1" : "0") : bit
+    )));
+    setHasFlippedBit(true);
+    unlock(5);
   }
 
-  function resetByte() {
-    setBits(toBits(agreedNumber));
-    setReceiverMap(agreedNumber);
-    setPrediction(null);
-    setRevealed(false);
+  function restartLesson() {
+    setCurrentStep(0);
+    setHighestUnlocked(0);
+    setIntroGuess(null);
+    setNumberDraft("65");
+    setAgreedNumber(65);
+    setConventionAnswer(null);
+    setSendRevealed(false);
+    setLabBits(toBits(65));
+    setHasFlippedBit(false);
+    setFinalAnswer(null);
   }
 
   return (
-    <main>
+    <main className="app-shell">
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="LLM Zero home">
+        <button className="brand brand-button" onClick={restartLesson} aria-label="Restart LLM Zero lesson">
           <span className="brand-mark">0</span>
           <span>LLM Zero</span>
-        </a>
+        </button>
         <div className="header-meta">
           <span className="open-badge">Open source</span>
-          <a href="https://github.com/ss-sonic/LLM-Zero">GitHub ↗</a>
+          <a href="https://github.com/ss-sonic/LLM-Zero" target="_blank" rel="noreferrer">GitHub ↗</a>
         </div>
       </header>
 
-      <section className="hero" id="top">
-        <p className="eyebrow">Lesson 01 · Text representation</p>
-        <h1>How can the letter <span className="hero-a">A</span> exist inside a computer?</h1>
-        <p className="hero-copy">
-          You see letters. A computer stores electrical states that we describe with numbers.
-          Let&apos;s build the bridge between those two worlds ourselves.
-        </p>
-        <a className="start-button" href="#experiment">Start the experiment ↓</a>
-      </section>
-
-      <section className="idea-strip" aria-label="Lesson path">
-        <div><b>1</b><span>Pick a symbol</span></div>
-        <span className="path-arrow">→</span>
-        <div><b>2</b><span>Agree on a number</span></div>
-        <span className="path-arrow">→</span>
-        <div><b>3</b><span>Store that number as bits</span></div>
-        <span className="path-arrow">→</span>
-        <div><b>4</b><span>Decode it again</span></div>
-      </section>
-
-      <section className="lesson" id="experiment">
-        <div className="lesson-heading">
-          <p className="step-label">Step 1</p>
-          <h2>First, choose something humans can see.</h2>
-          <p>A symbol is useful to us. But by itself, it gives the computer no rule for what to store.</p>
+      <nav className="lesson-progress" aria-label="Lesson progress">
+        <div className="progress-copy">
+          <span>Lesson 01</span>
+          <b>How computers represent text</b>
         </div>
-
-        <div className="symbol-picker card">
-          <div className="giant-symbol" aria-live="polite">{symbol}</div>
-          <div>
-            <p className="small-label">Choose a symbol</p>
-            <div className="preset-row">
-              {PRESETS.map((item) => (
+        <div className="progress-track">
+          {STEP_LABELS.map((label, index) => {
+            const unlocked = index <= highestUnlocked;
+            const complete = index < highestUnlocked;
+            const current = index === currentStep;
+            return (
+              <div className="progress-item" key={label}>
                 <button
-                  className={symbol === item.symbol ? "preset active" : "preset"}
-                  key={item.symbol}
-                  onClick={() => chooseSymbol(item.symbol)}
-                  aria-label={item.label}
+                  className={`progress-dot${current ? " current" : ""}${complete ? " complete" : ""}`}
+                  onClick={() => goTo(index)}
+                  disabled={!unlocked}
+                  aria-label={`${label}${unlocked ? "" : ", locked"}`}
+                  aria-current={current ? "step" : undefined}
+                  title={unlocked ? label : "Complete the previous step to unlock"}
                 >
-                  {item.symbol}
+                  {complete ? "✓" : unlocked ? index + 1 : "·"}
                 </button>
-              ))}
-            </div>
-            <label className="custom-symbol">
-              Or type one character
-              <input
-                value={symbol}
-                maxLength={2}
-                onChange={(event) => chooseSymbol(Array.from(event.target.value)[0] ?? "A")}
-                aria-label="Custom symbol"
-              />
-            </label>
-          </div>
+                {index < STEP_LABELS.length - 1 && <span className={complete ? "progress-line filled" : "progress-line"} />}
+              </div>
+            );
+          })}
         </div>
-      </section>
+      </nav>
 
-      <section className="lesson">
-        <div className="lesson-heading">
-          <p className="step-label">Step 2</p>
-          <h2>Now invent a rule.</h2>
-          <p>
-            We can decide that <strong>{symbol}</strong> will be represented by a number. The exact number is not magic.
-            What matters is that everyone who communicates agrees on the same rule.
-          </p>
-        </div>
-
-        <div className="mapping-card card">
-          <div className="mapping-side">
-            <span className="mapping-caption">Human symbol</span>
-            <span className="mapping-symbol">{symbol}</span>
-          </div>
-          <span className="mapping-arrow">→</span>
-          <div className="mapping-side">
-            <label className="mapping-caption" htmlFor="number-choice">Our agreed number</label>
-            <input
-              id="number-choice"
-              className="number-input"
-              type="number"
-              min="0"
-              max="255"
-              value={agreedNumber}
-              onChange={(event) => updateNumber(Number(event.target.value))}
-            />
-          </div>
-        </div>
-
-        <aside className="think-box">
-          <span>Think about it</span>
-          <p>
-            Could we have chosen <b>42</b> for {symbol}? Yes. Could we choose <b>201</b>? Also yes.
-            A mapping becomes useful when two systems agree to use it.
-          </p>
-        </aside>
-      </section>
-
-      <section className="lesson dark-lesson">
-        <div className="lesson-heading">
-          <p className="step-label">Step 3</p>
-          <h2>A number can be written using only 0 and 1.</h2>
-          <p>
-            Here we&apos;ll use eight positions — one <strong>byte</strong>. Each position represents a power of two.
-            Click any bit to flip it and watch the stored number change.
-          </p>
-        </div>
-
-        <div className="bit-lab card dark-card">
-          <div className="bit-values" aria-hidden="true">
-            {[128, 64, 32, 16, 8, 4, 2, 1].map((value) => <span key={value}>{value}</span>)}
-          </div>
-          <div className="bits" aria-label={`Binary value ${bits.join("")}`}>
-            {bits.map((bit, index) => (
-              <button key={index} onClick={() => flipBit(index)} className={bit === "1" ? "bit on" : "bit"}>
-                {bit}
-              </button>
-            ))}
-          </div>
-          <div className="equation">
-            <span>{bits.join("")}</span>
-            <b>=</b>
-            <strong>{bitNumber}</strong>
-          </div>
-          {bitNumber !== agreedNumber && (
-            <p className="changed-note">You changed the byte. It no longer stores our agreed number {agreedNumber}.</p>
-          )}
-          <button className="text-button" onClick={resetByte}>Reset to {symbol} → {agreedNumber}</button>
-        </div>
-      </section>
-
-      <section className="lesson">
-        <div className="lesson-heading">
-          <p className="step-label">Step 4</p>
-          <h2>Can another computer read it?</h2>
-          <p>
-            Imagine Computer 1 sends only the bits. Computer 2 needs the same mapping table to turn the number back into the symbol you meant.
-          </p>
-        </div>
-
-        <div className="computers">
-          <div className="computer card">
-            <span className="computer-title">Computer 1 · sender</span>
-            <div className="screen">
-              <span className="screen-symbol">{symbol}</span>
-              <span>→ {agreedNumber}</span>
-              <code>{toBits(agreedNumber).join("")}</code>
-            </div>
-          </div>
-          <div className="wire"><span>{toBits(agreedNumber).join("")}</span>→</div>
-          <div className="computer card">
-            <span className="computer-title">Computer 2 · receiver</span>
-            <label className="receiver-label">
-              In my table, {symbol} equals
-              <input
-                type="number"
-                min="0"
-                max="255"
-                value={receiverMap}
-                onChange={(event) => {
-                  const next = Math.max(0, Math.min(255, Number(event.target.value) || 0));
-                  setReceiverMap(next);
-                  setRevealed(false);
-                }}
-              />
-            </label>
-          </div>
-        </div>
-
-        <div className="prediction card">
-          <p>Before revealing the result: if the receiver uses a different mapping, will it recover the same symbol?</p>
-          <div className="prediction-actions">
-            <button className={prediction === "same" ? "choice selected" : "choice"} onClick={() => setPrediction("same")}>Yes, same symbol</button>
-            <button className={prediction === "different" ? "choice selected" : "choice"} onClick={() => setPrediction("different")}>No, something breaks</button>
-            <button className="reveal" disabled={!prediction} onClick={() => setRevealed(true)}>Reveal</button>
-          </div>
-          {revealed && (
-            <div className={receiverMap === agreedNumber ? "result correct" : "result mismatch"}>
-              <b>{receiverMap === agreedNumber ? "The rule matches." : "The rules disagree."}</b>
-              <span>
-                The sender transmitted {toBits(agreedNumber).join("")} = {agreedNumber}. The receiver&apos;s table says {symbol} = {receiverMap}.
-                {receiverMap === agreedNumber ? ` So it can recover ${symbol}.` : " So it cannot know that those bits were meant to represent your symbol."}
-              </span>
+      <section className={`lesson-stage ${currentStep === 4 ? "dark-stage" : ""}`}>
+        <div className="stage-inner" key={currentStep}>
+          {currentStep === 0 && (
+            <div className="screen-layout mystery-screen">
+              <div className="screen-copy">
+                <p className="eyebrow">The mystery</p>
+                <h1>How can the letter <span className="hero-a">A</span> exist inside a computer?</h1>
+                <p className="lead">You can see an A. A computer cannot store the shape in the same way your brain sees it. So what do you think is really inside?</p>
+              </div>
+              <div className="question-card card">
+                <p className="question-label">Make a guess. You do not need to know yet.</p>
+                <div className="choice-stack">
+                  {[
+                    ["picture", "A tiny picture of the letter"],
+                    ["number", "A number or pattern of 0s and 1s"],
+                    ["meaning", "The computer somehow understands what A means"],
+                  ].map(([value, label]) => (
+                    <button
+                      key={value}
+                      className={introGuess === value ? "choice-card selected" : "choice-card"}
+                      onClick={() => {
+                        setIntroGuess(value);
+                        unlock(1);
+                      }}
+                    >
+                      <span>{label}</span>
+                    </button>
+                  ))}
+                </div>
+                {introGuess && (
+                  <div className="reveal-panel">
+                    <b>Good. Keep that guess in your head.</b>
+                    <span>We are going to build the answer ourselves instead of memorizing it.</span>
+                    <button className="primary-button" onClick={() => unlockAndGo(1)}>Build the bridge →</button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
+
+          {currentStep === 1 && (
+            <div className="screen-layout split-screen">
+              <div className="screen-copy">
+                <p className="eyebrow">Step 2 · Invent a rule</p>
+                <h2>Suppose a computer is only willing to store numbers.</h2>
+                <p className="lead">We want to store <strong>A</strong>. Pick any whole number from 0 to 255 to stand for it.</p>
+                <p className="quiet-copy">There is no trick here. You are allowed to invent the rule.</p>
+              </div>
+              <div className="mapping-lab card">
+                <span className="mapping-caption">Your private rule</span>
+                <div className="mapping-equation">
+                  <span className="mapping-symbol">A</span>
+                  <span className="mapping-arrow">→</span>
+                  <input
+                    className="number-input"
+                    type="number"
+                    min="0"
+                    max="255"
+                    value={numberDraft}
+                    onChange={(event) => setNumberDraft(event.target.value)}
+                    aria-label="Choose a number for A"
+                  />
+                </div>
+                <p>Try 7. Try 42. Try 201. Your choice is allowed.</p>
+                <button
+                  className="primary-button full-button"
+                  disabled={numberDraft === "" || !Number.isFinite(Number(numberDraft))}
+                  onClick={commitNumber}
+                >
+                  Use this rule →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 2 && (
+            <div className="screen-layout centered-screen">
+              <div className="screen-copy centered-copy">
+                <p className="eyebrow">Step 3 · Question the rule</p>
+                <h2>You chose <span className="inline-token">A → {agreedNumber}</span></h2>
+                <p className="lead">Is {agreedNumber} somehow naturally connected to the letter A?</p>
+              </div>
+              <div className="binary-choice-row">
+                <button
+                  className={conventionAnswer === "yes" ? "big-choice selected" : "big-choice"}
+                  onClick={() => setConventionAnswer("yes")}
+                >
+                  <b>Yes</b>
+                  <span>The number must contain something about A.</span>
+                </button>
+                <button
+                  className={conventionAnswer === "no" ? "big-choice selected" : "big-choice"}
+                  onClick={() => {
+                    setConventionAnswer("no");
+                    unlock(3);
+                  }}
+                >
+                  <b>No</b>
+                  <span>We simply decided what the number means.</span>
+                </button>
+              </div>
+              {conventionAnswer === "yes" && (
+                <div className="feedback nudge">Try changing the number in your imagination. Could A have been 7 instead? If yes, the number itself cannot be special.</div>
+              )}
+              {conventionAnswer === "no" && (
+                <div className="feedback success-feedback">
+                  <div><b>Exactly.</b><span>The number is an identifier because we agreed to use it that way.</span></div>
+                  <button className="primary-button" onClick={() => unlockAndGo(3)}>Now break the agreement →</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="screen-layout centered-screen wide-screen">
+              <div className="screen-copy centered-copy compact-copy">
+                <p className="eyebrow">Step 4 · Two computers</p>
+                <h2>What if they agree on the number, but disagree on what it means?</h2>
+                <p className="lead">Computer 1 invented <strong>A → {agreedNumber}</strong>. Computer 2 independently invented <strong>{receiverSymbol} → {agreedNumber}</strong>.</p>
+              </div>
+
+              <div className="computer-experiment">
+                <div className="computer card">
+                  <span className="computer-title">Computer 1 · sender</span>
+                  <div className="screen">
+                    <span className="screen-symbol">A</span>
+                    <code>A → {agreedNumber}</code>
+                  </div>
+                </div>
+
+                <div className="transmission">
+                  <span className="packet">{agreedNumber}</span>
+                  <span className="wire-line">→</span>
+                  <small>Only the number travels</small>
+                </div>
+
+                <div className="computer card">
+                  <span className="computer-title">Computer 2 · receiver</span>
+                  <div className="screen receiver-screen">
+                    <span className="screen-symbol">{sendRevealed ? receiverSymbol : "?"}</span>
+                    <code>{receiverSymbol} → {agreedNumber}</code>
+                  </div>
+                </div>
+              </div>
+
+              {!sendRevealed ? (
+                <button
+                  className="primary-button experiment-button"
+                  onClick={() => {
+                    setSendRevealed(true);
+                    unlock(4);
+                  }}
+                >
+                  Send {agreedNumber} →
+                </button>
+              ) : (
+                <div className="feedback mismatch-feedback">
+                  <div>
+                    <b>Computer 2 reads {receiverSymbol}, not A.</b>
+                    <span>The same number can mean different things under different rules. Communication works only when the interpretation is shared.</span>
+                  </div>
+                  <button className="primary-button" onClick={() => unlockAndGo(4)}>So what gets stored? →</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="screen-layout centered-screen wide-screen bit-screen">
+              <div className="screen-copy centered-copy compact-copy">
+                <p className="eyebrow">Step 5 · Look underneath the number</p>
+                <h2>{agreedNumber} can be written using only 0 and 1.</h2>
+                <p className="lead">Here we use eight positions — one byte. Each position has a value. Click any bit once and watch the number change.</p>
+              </div>
+
+              <div className="bit-lab card dark-card">
+                <div className="bit-values" aria-hidden="true">
+                  {[128, 64, 32, 16, 8, 4, 2, 1].map((value) => <span key={value}>{value}</span>)}
+                </div>
+                <div className="bits" aria-label={`Binary value ${labBits.join("")}`}>
+                  {labBits.map((bit, index) => (
+                    <button
+                      key={index}
+                      onClick={() => flipBit(index)}
+                      className={bit === "1" ? "bit on" : "bit"}
+                      aria-label={`Bit worth ${2 ** (7 - index)}, currently ${bit}`}
+                    >
+                      {bit}
+                    </button>
+                  ))}
+                </div>
+                <div className="equation">
+                  <span>{labBits.join("")}</span>
+                  <b>=</b>
+                  <strong>{labNumber}</strong>
+                </div>
+                {!hasFlippedBit && <p className="lab-hint">Flip any one bit.</p>}
+                {hasFlippedBit && (
+                  <div className="bit-discovery">
+                    <p>One tiny 0/1 change changed the number from <b>{agreedNumber}</b> to <b>{labNumber}</b>.</p>
+                    <button
+                      className="primary-button light-button"
+                      onClick={() => {
+                        setLabBits(toBits(agreedNumber));
+                        unlockAndGo(5);
+                      }}
+                    >
+                      Put the original bits back →
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 5 && (
+            <div className="screen-layout centered-screen">
+              <div className="screen-copy centered-copy">
+                <p className="eyebrow">Final check</p>
+                <h2>So does the computer literally store the letter A?</h2>
+                <p className="lead">Choose the statement that matches what you just discovered.</p>
+              </div>
+              <div className="final-choices">
+                <button
+                  className={finalAnswer === "letter" ? "big-choice selected" : "big-choice"}
+                  onClick={() => setFinalAnswer("letter")}
+                >
+                  <b>Yes</b>
+                  <span>Somewhere inside memory there is an actual A.</span>
+                </button>
+                <button
+                  className={finalAnswer === "representation" ? "big-choice selected" : "big-choice"}
+                  onClick={() => {
+                    setFinalAnswer("representation");
+                    unlock(6);
+                  }}
+                >
+                  <b>No</b>
+                  <span>It stores a representation that our rules tell us to interpret as A.</span>
+                </button>
+              </div>
+              {finalAnswer === "letter" && (
+                <div className="feedback nudge">Remember what traveled between the two computers: only a number. The meaning came from the rule used to interpret it.</div>
+              )}
+              {finalAnswer === "representation" && (
+                <div className="feedback success-feedback">
+                  <div><b>That is the idea.</b><span>You have the first building block.</span></div>
+                  <button className="primary-button" onClick={() => unlockAndGo(6)}>Finish lesson →</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep === 6 && (
+            <div className="screen-layout complete-screen">
+              <div className="completion-mark">✓</div>
+              <p className="eyebrow">Lesson 01 complete</p>
+              <h2>Symbols do not magically live inside computers.</h2>
+              <p className="lead completion-lead">Humans define representations. Computers store the representation. Shared rules let us turn it back into something meaningful.</p>
+
+              <div className="final-pipeline" aria-label="Representation pipeline">
+                <div><small>Human sees</small><b>A</b></div>
+                <span>→</span>
+                <div><small>We agree on</small><b>{agreedNumber}</b></div>
+                <span>→</span>
+                <div><small>Computer stores</small><b className="binary-small">{toBits(agreedNumber).join("")}</b></div>
+              </div>
+
+              <div className="next-lesson-card">
+                <div>
+                  <small>Next mystery</small>
+                  <h3>What if every computer invents its own table?</h3>
+                  <p>That problem is why shared character standards had to exist.</p>
+                </div>
+                <span className="locked-pill">🔒 Lesson 02 · ASCII</span>
+              </div>
+
+              <button className="text-link-button" onClick={restartLesson}>Replay this lesson</button>
+            </div>
+          )}
         </div>
       </section>
 
-      <section className="lesson takeaway">
-        <p className="step-label">What you discovered</p>
-        <h2>The number does not contain the meaning.</h2>
-        <p className="takeaway-copy">
-          We gave a human symbol an agreed numeric identifier, then stored that number with bits. The number itself does not "understand" {symbol}.
-          It works because systems share a convention for interpreting it.
-        </p>
-        <div className="pipeline" aria-label="Representation pipeline">
-          <div><small>Human sees</small><b>{symbol}</b></div>
-          <span>→</span>
-          <div><small>We agree on</small><b>{agreedNumber}</b></div>
-          <span>→</span>
-          <div><small>Computer stores</small><b className="binary-small">{toBits(agreedNumber).join("")}</b></div>
-        </div>
-        <div className="next-card">
-          <div>
-            <small>Next question</small>
-            <h3>What if every computer invents its own table?</h3>
-            <p>That problem leads us to shared character standards — and eventually ASCII.</p>
-          </div>
-          <span className="locked">Lesson 02 · coming next</span>
-        </div>
-      </section>
-
-      <footer>
-        <div><b>LLM Zero</b><span>Built in public, for everyone.</span></div>
-        <p>Open source · First principles · No black boxes</p>
-      </footer>
+      <div className="stage-footer" aria-label="Lesson navigation">
+        <button className="back-button" onClick={() => setCurrentStep((step) => Math.max(0, step - 1))} disabled={currentStep === 0}>← Back</button>
+        <span>{currentStep + 1} / {STEP_LABELS.length}</span>
+        <span className="footer-hint">Complete this screen to unlock the next one.</span>
+      </div>
     </main>
   );
 }
