@@ -30,7 +30,7 @@ export function PublishStandardStep({
     <div className="screen-layout split-screen l3-builder-screen">
       <div className="screen-copy">
         <p className="eyebrow">Step 2 · Publish a standard</p>
-        <h2>Can you make a rulebook that three computers can use without negotiating?</h2>
+        <h2>Can three computers use one rulebook without negotiating?</h2>
         <p className="lead">Assign A, B, and C three different numbers. Then publish the table once so every machine installs the exact same mapping.</p>
         <p className="quiet-copy">The numbers themselves are still your choice. What changes is that the rule is now shared in advance.</p>
       </div>
