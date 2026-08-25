@@ -48,7 +48,9 @@ export function NumbersMatterStep({
 
       {tested && (
         <div className="l2-question-block">
-          <h3 className="l2-decision-question">Why did the strange table still work?</h3>
+          <div className="screen-copy centered-copy compact-copy">
+            <h2>Why did the strange table still work?</h2>
+          </div>
           <div className="binary-choice-row">
             <button className={answer === "intrinsic" ? "big-choice selected" : "big-choice"} onClick={() => onAnswer("intrinsic")}>
               <b>7 naturally means B</b><span>The number itself contains something about the letter.</span>
