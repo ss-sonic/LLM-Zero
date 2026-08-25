@@ -13,7 +13,7 @@ export function PrefixesStep({ seen, onInspect, onContinue }: { seen: number[]; 
         {UTF8_PATTERNS.map((pattern) => (
           <button className={seen.includes(pattern.width) ? "seen" : ""} key={pattern.width} onClick={() => onInspect(pattern.width)}>
             <small>{pattern.width} byte{pattern.width > 1 ? "s" : ""}</small>
-            <div>{pattern.template.map((byte) => <code key={byte}>{byte}</code>)}</div>
+            <div>{pattern.template.map((byte, index) => <code key={`${pattern.width}-${index}`}>{byte}</code>)}</div>
             <span>{pattern.payloadBits} payload bits</span>
           </button>
         ))}
