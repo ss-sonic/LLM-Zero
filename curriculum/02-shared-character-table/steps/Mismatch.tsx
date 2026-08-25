@@ -13,8 +13,8 @@ export function MismatchStep({
     <div className="screen-layout centered-screen wide-screen l2-screen">
       <div className="screen-copy centered-copy compact-copy">
         <p className="eyebrow">Lesson 02 · The mismatch</p>
-        <h1>Computer 1 wants to send the letter A.</h1>
-        <p className="lead">It cannot send the shape itself, so it uses its private rule: <strong>A → {SENDER_PRIVATE_TABLE.A}</strong>. What will Computer 2 see?</p>
+        <h1>Computer 1 sends A. What will Computer 2 see?</h1>
+        <p className="lead">Computer 1 cannot send the visible shape itself. It uses its private rule <strong>A → {SENDER_PRIVATE_TABLE.A}</strong>, and only the number travels.</p>
       </div>
 
       <div className="l2-wire-experiment" aria-label="Two computers using different character tables">
