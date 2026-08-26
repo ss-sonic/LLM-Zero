@@ -9,6 +9,7 @@ import { UNICODE_CODE_POINT_STEPS, UNICODE_CODE_POINT_STORAGE_KEY } from "../../
 import { CODE_POINTS_VS_BYTES_STEPS, CODE_POINTS_VS_BYTES_STORAGE_KEY } from "../../curriculum/06-code-points-vs-bytes/config";
 import { HEXADECIMAL_BRIDGE_STEPS, HEXADECIMAL_BRIDGE_STORAGE_KEY } from "../../curriculum/06a-hexadecimal/config";
 import { UTF_8_STEPS, UTF_8_STORAGE_KEY } from "../../curriculum/07-utf-8/config";
+import { UTF_ENCODINGS_STEPS, UTF_ENCODINGS_STORAGE_KEY } from "../../curriculum/08-utf-encodings/config";
 
 const LESSON_SOURCES = [
   { storageKey: CHARACTER_REPRESENTATION_STORAGE_KEY, steps: CHARACTER_REPRESENTATION_STEPS },
@@ -19,6 +20,7 @@ const LESSON_SOURCES = [
   { storageKey: CODE_POINTS_VS_BYTES_STORAGE_KEY, steps: CODE_POINTS_VS_BYTES_STEPS },
   { storageKey: HEXADECIMAL_BRIDGE_STORAGE_KEY, steps: HEXADECIMAL_BRIDGE_STEPS },
   { storageKey: UTF_8_STORAGE_KEY, steps: UTF_8_STEPS },
+  { storageKey: UTF_ENCODINGS_STORAGE_KEY, steps: UTF_ENCODINGS_STEPS },
 ];
 
 describe("curriculum registry", () => {

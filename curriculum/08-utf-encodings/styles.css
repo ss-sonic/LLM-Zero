@@ -1,0 +1,277 @@
+/* Lesson 08 — UTF-8 vs UTF-16 vs UTF-32. */
+
+.l8-screen {
+  gap: 24px;
+  min-height: min(660px, 72vh);
+  justify-content: flex-start;
+  padding-top: 6px;
+}
+
+.l8-main-action { margin-top: 4px; }
+.l8-hint { margin: 0; color: var(--muted); font-size: 13px; text-align: center; }
+.l8-turn {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.l8-input {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--paper);
+  padding: 11px 12px;
+  width: 158px;
+  color: var(--ink);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 20px;
+  font-weight: 800;
+}
+.l8-input.small { width: 92px; font-size: 19px; }
+.l8-input.tight { width: 116px; font-size: 19px; }
+.l8-input.bits { width: 152px; font-size: 16px; letter-spacing: .1em; }
+.l8-input.right { border-color: var(--accent); color: var(--accent); }
+.l8-input.wrong { border-color: #d98b74; }
+
+.l8-decision-question {
+  margin: 0 auto;
+  max-width: 780px;
+  font-size: clamp(20px, 2.5vw, 28px);
+  line-height: 1.18;
+  letter-spacing: -.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Step 1 — the bet */
+.l8-bet-grid { width: min(900px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.l8-named { width: min(760px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l8-named > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 6px; text-align: left; }
+.l8-named small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-named b { font-size: 22px; letter-spacing: -.02em; }
+.l8-named span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+/* Step 2 — random access */
+.l8-access-lab { width: min(980px, 100%); padding: 26px; display: grid; gap: 18px; }
+.l8-access-row {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  padding: 14px 16px;
+}
+.l8-access-label { display: grid; gap: 3px; }
+.l8-access-label small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-access-label b { font-size: 16px; }
+.l8-access-label span { color: var(--muted); font-size: 11px; }
+.l8-byte-run { display: flex; flex-wrap: wrap; gap: 4px; }
+.l8-byte-run code {
+  border-radius: 8px;
+  background: var(--card);
+  padding: 5px 7px;
+  display: grid;
+  gap: 1px;
+  justify-items: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.l8-byte-run code small { color: #b3ada0; font-size: 8px; }
+.l8-byte-run.fixed code { background: #efece3; padding: 5px 10px; font-size: 15px; }
+
+/* Step 3 — the bet loses */
+.l8-fit-lab { width: min(820px, 100%); padding: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.l8-fit-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  padding: 16px 18px;
+  min-width: 116px;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  cursor: pointer;
+  transition: border-color .12s ease, background .12s ease;
+}
+.l8-fit-card strong { font-size: 30px; line-height: 1.05; }
+.l8-fit-card code { color: var(--muted); font-size: 12px; }
+.l8-fit-card small { text-transform: uppercase; letter-spacing: .08em; font-size: 9px; font-weight: 800; color: #b3ada0; }
+.l8-fit-card.fits { border-color: var(--accent); background: #fdf3ee; }
+.l8-fit-card.fits small { color: var(--accent); }
+.l8-fit-card.too-big { background: #efece3; }
+.l8-fit-card.wrong { border-color: #d98b74; }
+
+/* Step 4 — the patch */
+.l8-patch { width: min(880px, 100%); padding: 26px; display: grid; gap: 20px; justify-items: center; }
+.l8-patch-steps { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.l8-patch-steps > div { border: 1px solid var(--line); border-radius: 15px; background: var(--paper); padding: 15px; display: grid; gap: 6px; text-align: left; }
+.l8-patch-steps small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-patch-steps b { line-height: 1.35; }
+.l8-patch-steps span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l8-blocks { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l8-blocks > div { border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 15px; display: grid; gap: 5px; justify-items: center; }
+.l8-blocks small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-blocks code { font-size: 15px; font-weight: 700; }
+.l8-blocks b { color: var(--accent); font-size: 13px; }
+.l8-patch-question { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.l8-patch-question label { max-width: 42ch; color: var(--ink); font-weight: 600; line-height: 1.5; }
+
+/* Step 5 — the ceiling */
+.l8-ceiling-lab { width: min(820px, 100%); padding: 28px; display: grid; gap: 16px; justify-items: center; }
+.l8-sum { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.l8-sum > div { border: 1px solid var(--line); border-radius: 15px; background: var(--paper); padding: 14px 18px; display: grid; gap: 4px; justify-items: center; }
+.l8-sum small { color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l8-sum b { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 21px; }
+.l8-sum span { color: var(--muted); font-size: 11px; }
+.l8-op { color: #b3ada0; font-size: 22px; }
+.l8-sum-total { border-color: var(--accent) !important; background: #fdf3ee !important; }
+.l8-verdict { width: min(960px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.l8-verdict > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l8-verdict small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-verdict b { line-height: 1.4; }
+.l8-verdict span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l8-verdict-key { border-color: var(--accent) !important; background: #fdf3ee !important; }
+.l8-verdict-key small { color: var(--accent); }
+
+/* Step 6 — byte order */
+.l8-order-lab { width: min(880px, 100%); padding: 26px; display: grid; gap: 18px; justify-items: center; }
+.l8-order-source { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.l8-order-source > div { border: 1px solid var(--line); border-radius: 15px; background: var(--paper); padding: 13px 16px; display: grid; gap: 4px; justify-items: center; min-width: 108px; }
+.l8-order-source small { color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l8-order-source strong { font-size: 26px; }
+.l8-order-source code { font-size: 17px; font-weight: 700; letter-spacing: .06em; }
+.l8-order-source > span { color: #b3ada0; }
+.l8-order-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.l8-order-button {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  padding: 14px 20px;
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+  text-align: left;
+}
+.l8-order-button b { font-size: 15px; }
+.l8-order-button span { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.l8-order-button.seen { border-color: #c3bdb0; }
+.l8-order-button.active { border-color: var(--accent); background: #fdf3ee; }
+.l8-order-result {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  padding: 16px;
+}
+.l8-order-result.broken { border-color: #d98b74; background: #fdf0eb; }
+.l8-order-result > div { display: grid; gap: 4px; justify-items: center; }
+.l8-order-result small { color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l8-order-result code { font-size: 17px; font-weight: 700; letter-spacing: .06em; }
+.l8-order-result b { max-width: 30ch; font-size: 13px; line-height: 1.4; text-align: center; }
+.l8-order-result > span { color: var(--muted); font-size: 12px; }
+.l8-recall-block { width: min(900px, 100%); display: grid; gap: 16px; justify-items: center; }
+.l8-immunity { width: min(820px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l8-immunity > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l8-immunity small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-immunity span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l8-immunity-key { border-color: var(--accent) !important; background: #fdf3ee !important; }
+.l8-immunity-key small { color: var(--accent); }
+
+/* Step 7 — the surrogate pair */
+.l8-build { width: min(880px, 100%); padding: 28px; display: grid; gap: 24px; }
+.l8-build-task { display: grid; gap: 12px; justify-items: center; }
+.l8-build-task + .l8-build-task { border-top: 1px solid var(--line); padding-top: 22px; }
+.l8-build-task > small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-build-copy { max-width: 62ch; margin: 0; color: var(--muted); line-height: 1.6; text-align: center; }
+.l8-inline { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.l8-inline label { max-width: 46ch; color: var(--ink); font-weight: 600; line-height: 1.5; }
+.l8-bitstream { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
+.l8-bitstream code { border-radius: 6px; background: var(--paper); padding: 5px 7px; font-size: 14px; font-weight: 700; }
+.l8-bitstream code.edge { border-right: 2px solid var(--accent); }
+.l8-halves { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.l8-half { display: grid; gap: 6px; justify-items: center; }
+.l8-half small { color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l8-half-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.l8-half-sum code { font-size: 14px; letter-spacing: .08em; }
+.l8-half-sum span { color: #b3ada0; }
+.l8-half-sum b { color: var(--accent); font-size: 13px; }
+.l8-two-ways { width: min(760px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l8-two-ways > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 6px; justify-items: center; }
+.l8-two-ways small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-two-ways code { font-size: 17px; font-weight: 800; letter-spacing: .06em; }
+.l8-two-ways span { color: var(--muted); font-size: 12px; }
+
+/* Step 8 — the comparison */
+.l8-price-lab { width: min(700px, 100%); padding: 26px; display: grid; gap: 12px; }
+.l8-price-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  padding: 13px 16px;
+}
+.l8-price-row > div { display: grid; gap: 3px; }
+.l8-price-row small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-price-row span { color: var(--muted); font-size: 12px; }
+.l8-price-row > small { color: var(--muted); }
+.l8-table { width: min(760px, 100%); border: 1px solid var(--line); border-radius: 18px; background: var(--card); overflow: hidden; }
+.l8-table-head, .l8-table-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; align-items: center; gap: 10px; padding: 12px 18px; }
+.l8-table-head { background: var(--paper); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-table-row { border-top: 1px solid var(--line); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 15px; }
+.l8-table-row code { font-family: inherit; }
+.l8-table-row .best { color: var(--accent); font-weight: 800; }
+.l8-uses { width: min(960px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.l8-uses > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l8-uses small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-uses b { line-height: 1.4; }
+.l8-uses span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+/* Completion */
+.l8-complete-screen { gap: 20px; }
+.l8-final-model { width: min(960px, 100%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.l8-final-model > div { border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 13px 16px; display: grid; gap: 5px; justify-items: center; min-width: 122px; }
+.l8-final-model small { color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l8-final-model strong { font-size: 22px; }
+.l8-final-model code { color: var(--accent); font-size: 14px; font-weight: 700; }
+.l8-final-model span { color: var(--muted); font-size: 11px; }
+.l8-final-model > span { color: #b3ada0; }
+.l8-earned { width: min(980px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.l8-earned > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l8-earned small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-earned b { line-height: 1.4; }
+.l8-earned span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l8-solved-open { width: min(820px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l8-solved-open > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l8-solved-open small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l8-solved-open b { line-height: 1.45; }
+.l8-pending-badge { border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+.l8-complete-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px; }
+
+@media (max-width: 900px) {
+  .l8-patch-steps, .l8-verdict, .l8-uses, .l8-earned { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .l8-bet-grid, .l8-named, .l8-blocks, .l8-immunity, .l8-two-ways, .l8-solved-open { grid-template-columns: 1fr; }
+  .l8-access-row { grid-template-columns: 1fr; row-gap: 10px; }
+  .l8-table-head, .l8-table-row { grid-template-columns: 1.6fr repeat(4, 1fr); padding: 10px 12px; font-size: 13px; }
+  .l8-access-lab, .l8-build, .l8-patch { padding: 18px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l8-fit-card { transition: none; }
+}

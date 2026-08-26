@@ -39,13 +39,13 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
         <div><small>new problem</small><b>If UTF-8 does all of this, why does more than one Unicode encoding exist — and why does Unicode stop at {MAX_CODE_POINT.toLocaleString("en-US")}?</b></div>
       </div>
 
-      <div className="next-lesson-card pending">
+      <div className="next-lesson-card">
         <div>
           <small>Next</small>
           <h3>UTF-8 vs UTF-16 vs UTF-32</h3>
           <p>The ceiling you met in step 6 was not UTF-8&apos;s. It was inherited from a different encoding, which made a different bet about how big characters would get.</p>
         </div>
-        <span className="l7-pending-badge">Coming next</span>
+        <Link className="primary-button" href="/lessons/utf-encodings">Start Lesson 08 →</Link>
       </div>
 
       <div className="l7-complete-actions">
