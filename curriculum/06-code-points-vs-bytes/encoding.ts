@@ -22,6 +22,19 @@ export function decodeFixedWidth(bytes: number[]) {
   );
 }
 
+/**
+ * The fewest byte positions this rule would need for a value.
+ *
+ * Lesson 06 only ever used one fixed width. Lesson 07 opens by asking what
+ * happens if the width is allowed to vary, so it needs to know the minimum.
+ */
+export function minimumWidthFor(value: number) {
+  if (!Number.isInteger(value) || value < 0) return null;
+  let width = 1;
+  while (value > maxValueForWidth(width)) width += 1;
+  return width;
+}
+
 export function isByteValue(value: number) {
   return Number.isInteger(value) && value >= 0 && value <= BYTE_MAX;
 }

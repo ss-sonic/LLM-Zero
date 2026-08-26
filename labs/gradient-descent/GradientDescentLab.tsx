@@ -385,7 +385,7 @@ export function GradientDescentLab() {
         <p className="eyebrow">Interaction prototype complete</p>
         <h2>The lesson shell can carry continuous and multi-step numeric work.</h2>
         <p className="lead completion-lead">The prototype used a live numeric scrubber, a loss curve, learner-chosen measurements, and a three-line derivation with no value handed over. Phase 4 should build on these interaction types rather than forcing gradients into ChoiceCards.</p>
-        <p className={styles.labNote}>Still untested: symbolic manipulation, where the learner rearranges an expression rather than evaluating one. That remains an open R&amp;D checkpoint.</p>
+        <p className={styles.labNote}>This prototype only ever <i>evaluates</i> an expression it is given. Rearranging one — moving a parameter to the other side of an equals sign — is a different interaction, and it has its own prototype at <a href="/labs/symbolic-rearrangement">/labs/symbolic-rearrangement</a>.</p>
         <button className="primary-button" onClick={restart}>Replay the prototype</button>
       </div>
     );

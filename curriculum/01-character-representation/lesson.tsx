@@ -1,15 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { LessonPlayer } from "../../components/lesson/LessonPlayer";
 import { emptyByte, isBitArray, toBits } from "../../lib/lesson/binary";
-import { readStepFromUrl, writeStepToUrl } from "../../lib/lesson/navigation";
-import {
-  clearPersistedLessonState,
-  readPersistedLessonState,
-  writePersistedLessonState,
-} from "../../lib/lesson/persistence";
-import { clampStep } from "../../lib/lesson/progress";
+import { useLessonProgress } from "../../lib/lesson/useLessonProgress";
 import {
   CHARACTER_REPRESENTATION_STEPS,
   CHARACTER_REPRESENTATION_STORAGE_KEY,
@@ -25,72 +19,33 @@ import type {
   BitPhase,
   CharacterRepresentationPersistedState,
   ConventionAnswer,
-  FinalAnswer,
 } from "./types";
 
 const STEP_COUNT = CHARACTER_REPRESENTATION_STEPS.length;
+const DEFAULT_NUMBER = 65;
+
+function safeAgreedNumber(value: unknown) {
+  return Math.max(0, Math.min(255, Math.round(typeof value === "number" ? value : DEFAULT_NUMBER)));
+}
 
 export function CharacterRepresentationLesson() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [highestUnlocked, setHighestUnlocked] = useState(0);
   const [introGuess, setIntroGuess] = useState<string | null>(null);
-  const [numberDraft, setNumberDraft] = useState("65");
-  const [agreedNumber, setAgreedNumber] = useState(65);
+  const [numberDraft, setNumberDraft] = useState(String(DEFAULT_NUMBER));
+  const [agreedNumber, setAgreedNumber] = useState(DEFAULT_NUMBER);
   const [conventionAnswer, setConventionAnswer] = useState<ConventionAnswer>(null);
   const [sendRevealed, setSendRevealed] = useState(false);
   const [labBits, setLabBits] = useState<string[]>(() => emptyByte());
   const [bitPhase, setBitPhase] = useState<BitPhase>("build");
   const [hasFlippedBit, setHasFlippedBit] = useState(false);
-  const [finalAnswer, setFinalAnswer] = useState<FinalAnswer>(null);
+  const [proofBits, setProofBits] = useState<string[]>(() => emptyByte());
+  const [receiverRule, setReceiverRule] = useState("");
 
   const targetBits = useMemo(() => toBits(agreedNumber), [agreedNumber]);
 
-  useEffect(() => {
-    const saved = readPersistedLessonState<CharacterRepresentationPersistedState>(
-      CHARACTER_REPRESENTATION_STORAGE_KEY,
-    );
-    const restoredHighest = clampStep(
-      typeof saved?.highestUnlocked === "number" ? saved.highestUnlocked : 0,
-      STEP_COUNT - 1,
-      STEP_COUNT,
-    );
-    const restoredAgreedNumber = Math.max(
-      0,
-      Math.min(255, Math.round(typeof saved?.agreedNumber === "number" ? saved.agreedNumber : 65)),
-    );
-    const requestedStep = readStepFromUrl();
-    const restoredCurrent = clampStep(
-      requestedStep ?? (typeof saved?.currentStep === "number" ? saved.currentStep : 0),
-      restoredHighest,
-      STEP_COUNT,
-    );
-
-    setHighestUnlocked(restoredHighest);
-    setCurrentStep(restoredCurrent);
-    setIntroGuess(typeof saved?.introGuess === "string" ? saved.introGuess : null);
-    setNumberDraft(typeof saved?.numberDraft === "string" ? saved.numberDraft : String(restoredAgreedNumber));
-    setAgreedNumber(restoredAgreedNumber);
-    setConventionAnswer(saved?.conventionAnswer === "yes" || saved?.conventionAnswer === "no" ? saved.conventionAnswer : null);
-    setSendRevealed(saved?.sendRevealed === true);
-    setLabBits(isBitArray(saved?.labBits) ? saved.labBits : emptyByte());
-    setBitPhase(saved?.bitPhase === "explain" || saved?.bitPhase === "play" ? saved.bitPhase : "build");
-    setHasFlippedBit(saved?.hasFlippedBit === true);
-    setFinalAnswer(
-      saved?.finalAnswer === "letter" || saved?.finalAnswer === "representation"
-        ? saved.finalAnswer
-        : null,
-    );
-    writeStepToUrl(restoredCurrent, "replace");
-    setHasHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hasHydrated) return;
-
-    const state: CharacterRepresentationPersistedState = {
-      currentStep,
-      highestUnlocked,
+  const progress = useLessonProgress<CharacterRepresentationPersistedState>({
+    storageKey: CHARACTER_REPRESENTATION_STORAGE_KEY,
+    stepCount: STEP_COUNT,
+    lessonState: {
       introGuess,
       numberDraft,
       agreedNumber,
@@ -99,62 +54,41 @@ export function CharacterRepresentationLesson() {
       labBits,
       bitPhase,
       hasFlippedBit,
-      finalAnswer,
-    };
-
-    writePersistedLessonState(CHARACTER_REPRESENTATION_STORAGE_KEY, state);
-  }, [
-    hasHydrated,
-    currentStep,
-    highestUnlocked,
-    introGuess,
-    numberDraft,
-    agreedNumber,
-    conventionAnswer,
-    sendRevealed,
-    labBits,
-    bitPhase,
-    hasFlippedBit,
-    finalAnswer,
-  ]);
-
-  useEffect(() => {
-    if (!hasHydrated) return;
-
-    function handlePopState() {
-      const requested = readStepFromUrl();
-      if (requested === null) return;
-
-      const safeStep = clampStep(requested, highestUnlocked, STEP_COUNT);
-      setCurrentStep(safeStep);
-      if (safeStep !== requested) writeStepToUrl(safeStep, "replace");
-    }
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [hasHydrated, highestUnlocked]);
-
-  function unlock(step: number) {
-    setHighestUnlocked((current) => Math.min(STEP_COUNT - 1, Math.max(current, step)));
-  }
-
-  function goTo(step: number, mode: "push" | "replace" = "push") {
-    if (step < 0 || step > highestUnlocked) return;
-    setCurrentStep(step);
-    if (hasHydrated) writeStepToUrl(step, mode);
-  }
-
-  function unlockAndGo(step: number) {
-    unlock(step);
-    setCurrentStep(step);
-    if (hasHydrated) writeStepToUrl(step, "push");
-  }
+      proofBits,
+      receiverRule,
+    },
+    onRestore: (saved) => {
+      const restoredNumber = safeAgreedNumber(saved?.agreedNumber);
+      setIntroGuess(typeof saved?.introGuess === "string" ? saved.introGuess : null);
+      setNumberDraft(typeof saved?.numberDraft === "string" ? saved.numberDraft : String(restoredNumber));
+      setAgreedNumber(restoredNumber);
+      setConventionAnswer(saved?.conventionAnswer === "yes" || saved?.conventionAnswer === "no" ? saved.conventionAnswer : null);
+      setSendRevealed(saved?.sendRevealed === true);
+      setLabBits(isBitArray(saved?.labBits) ? saved.labBits : emptyByte());
+      setBitPhase(saved?.bitPhase === "explain" || saved?.bitPhase === "play" ? saved.bitPhase : "build");
+      setHasFlippedBit(saved?.hasFlippedBit === true);
+      setProofBits(isBitArray(saved?.proofBits) ? saved.proofBits : emptyByte());
+      setReceiverRule(typeof saved?.receiverRule === "string" ? saved.receiverRule : "");
+    },
+    onReset: () => {
+      setIntroGuess(null);
+      setNumberDraft(String(DEFAULT_NUMBER));
+      setAgreedNumber(DEFAULT_NUMBER);
+      setConventionAnswer(null);
+      setSendRevealed(false);
+      setLabBits(emptyByte());
+      setBitPhase("build");
+      setHasFlippedBit(false);
+      setProofBits(emptyByte());
+      setReceiverRule("");
+    },
+  });
 
   function commitNumber() {
     const parsed = Number(numberDraft);
     if (!Number.isFinite(parsed)) return;
 
-    const safe = Math.max(0, Math.min(255, Math.round(parsed)));
+    const safe = safeAgreedNumber(parsed);
     setAgreedNumber(safe);
     setNumberDraft(String(safe));
     setLabBits(emptyByte());
@@ -162,7 +96,9 @@ export function CharacterRepresentationLesson() {
     setHasFlippedBit(false);
     setSendRevealed(false);
     setConventionAnswer(null);
-    unlockAndGo(2);
+    setProofBits(emptyByte());
+    setReceiverRule("");
+    progress.unlockAndGo(2);
   }
 
   function toggleBit(index: number) {
@@ -171,38 +107,22 @@ export function CharacterRepresentationLesson() {
     )));
   }
 
-  function restartLesson() {
-    setCurrentStep(0);
-    setHighestUnlocked(0);
-    setIntroGuess(null);
-    setNumberDraft("65");
-    setAgreedNumber(65);
-    setConventionAnswer(null);
-    setSendRevealed(false);
-    setLabBits(emptyByte());
-    setBitPhase("build");
-    setHasFlippedBit(false);
-    setFinalAnswer(null);
-    clearPersistedLessonState(CHARACTER_REPRESENTATION_STORAGE_KEY);
-    if (hasHydrated) writeStepToUrl(0, "replace");
-  }
-
-  if (!hasHydrated) {
+  if (!progress.hasHydrated) {
     return <main className="app-shell" aria-busy="true" />;
   }
 
   let screen;
 
-  switch (currentStep) {
+  switch (progress.currentStep) {
     case 0:
       screen = (
         <MysteryStep
           introGuess={introGuess}
           onGuess={(guess) => {
             setIntroGuess(guess);
-            unlock(1);
+            progress.unlock(1);
           }}
-          onContinue={() => unlockAndGo(1)}
+          onContinue={() => progress.unlockAndGo(1)}
         />
       );
       break;
@@ -222,9 +142,9 @@ export function CharacterRepresentationLesson() {
           answer={conventionAnswer}
           onAnswer={(answer) => {
             setConventionAnswer(answer);
-            if (answer === "no") unlock(3);
+            if (answer === "no") progress.unlock(3);
           }}
-          onContinue={() => unlockAndGo(3)}
+          onContinue={() => progress.unlockAndGo(3)}
         />
       );
       break;
@@ -235,9 +155,9 @@ export function CharacterRepresentationLesson() {
           sendRevealed={sendRevealed}
           onSend={() => {
             setSendRevealed(true);
-            unlock(4);
+            progress.unlock(4);
           }}
-          onContinue={() => unlockAndGo(4)}
+          onContinue={() => progress.unlockAndGo(4)}
         />
       );
       break;
@@ -261,11 +181,11 @@ export function CharacterRepresentationLesson() {
           onFlipBit={(index) => {
             toggleBit(index);
             setHasFlippedBit(true);
-            unlock(5);
+            progress.unlock(5);
           }}
           onContinue={() => {
             setLabBits(targetBits);
-            unlockAndGo(5);
+            progress.unlockAndGo(5);
           }}
         />
       );
@@ -273,30 +193,33 @@ export function CharacterRepresentationLesson() {
     case 5:
       screen = (
         <FinalCheckStep
-          answer={finalAnswer}
-          onAnswer={(answer) => {
-            setFinalAnswer(answer);
-            if (answer === "representation") unlock(6);
-          }}
-          onContinue={() => unlockAndGo(6)}
+          agreedNumber={agreedNumber}
+          proofBits={proofBits}
+          receiverRule={receiverRule}
+          onToggleProofBit={(index) => setProofBits((current) => current.map((bit, bitIndex) => (
+            bitIndex === index ? (bit === "0" ? "1" : "0") : bit
+          )))}
+          onReceiverRuleChange={setReceiverRule}
+          onContinue={() => progress.unlockAndGo(6)}
         />
       );
       break;
     default:
-      screen = <CompleteStep agreedNumber={agreedNumber} onRestart={restartLesson} />;
+      screen = <CompleteStep agreedNumber={agreedNumber} onRestart={progress.restart} />;
   }
 
   return (
     <LessonPlayer
       lessonNumber={1}
+      lessonSlug="character-representation"
       title="How computers represent text"
       stepLabels={CHARACTER_REPRESENTATION_STEPS}
-      currentStep={currentStep}
-      highestUnlocked={highestUnlocked}
-      darkStage={currentStep === 4}
-      onNavigate={(step) => goTo(step)}
-      onBack={() => goTo(Math.max(0, currentStep - 1))}
-      onRestart={restartLesson}
+      currentStep={progress.currentStep}
+      highestUnlocked={progress.highestUnlocked}
+      darkStage={progress.currentStep === 4}
+      onNavigate={(step) => progress.goTo(step)}
+      onBack={progress.back}
+      onRestart={progress.restart}
     >
       {screen}
     </LessonPlayer>

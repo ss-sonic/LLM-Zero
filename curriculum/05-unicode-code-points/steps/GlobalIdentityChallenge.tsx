@@ -1,81 +1,120 @@
 "use client";
 
-import { ChoiceCard } from "../../../components/ui/ChoiceCard";
 import { Feedback } from "../../../components/ui/Feedback";
-import { UNICODE_EXAMPLES } from "../config";
+import { QuestionPrompt } from "../../../components/ui/QuestionPrompt";
+import { TextRecall, type RecallAssessment } from "../../../components/ui/TextRecall";
+import { ROCKET_EXAMPLE } from "../config";
 import { toUnicodeNotation } from "../unicode";
-import type { ChallengeMatches, FinalConceptAnswer } from "../types";
 
+const ASCII_A = 65;
+
+/**
+ * Lesson completion as construction plus recall.
+ *
+ * The earlier version matched five characters against a dropdown containing the
+ * five code points shown one screen before, then closed with three cards where
+ * one was naive, one overconfident and one carefully worded — passable by reading
+ * the question rather than the concept. Here the learner produces a code point
+ * from an earlier lesson, and states the identity/storage split in their own words
+ * before seeing it.
+ */
 export function GlobalIdentityChallengeStep({
-  matches,
-  finalAnswer,
-  onMatch,
-  onFinalAnswer,
+  asciiInput,
+  recallText,
+  recallCommitted,
+  recallAssessment,
+  onAsciiInputChange,
+  onRecallChange,
+  onRecallCommit,
+  onRecallAssess,
+  onRecallRewrite,
   onFinish,
 }: {
-  matches: ChallengeMatches;
-  finalAnswer: FinalConceptAnswer;
-  onMatch: (index: number, value: string) => void;
-  onFinalAnswer: (answer: Exclude<FinalConceptAnswer, null>) => void;
+  asciiInput: string;
+  recallText: string;
+  recallCommitted: boolean;
+  recallAssessment: RecallAssessment;
+  onAsciiInputChange: (value: string) => void;
+  onRecallChange: (value: string) => void;
+  onRecallCommit: () => void;
+  onRecallAssess: (assessment: Exclude<RecallAssessment, null>) => void;
+  onRecallRewrite: () => void;
   onFinish: () => void;
 }) {
-  const allSelected = matches.every((value) => value !== null);
-  const allCorrect = UNICODE_EXAMPLES.every((example, index) => matches[index] === toUnicodeNotation(example.decimal));
+  const touched = asciiInput.trim() !== "";
+  const entered = Number(asciiInput);
+  const solved = touched && Number.isInteger(entered) && entered === ASCII_A;
 
   return (
     <div className="screen-layout centered-screen wide-screen l5-screen">
-      <div className="screen-copy centered-copy compact-copy">
-        <p className="eyebrow">Step 7 · Global identity challenge</p>
-        <h2>Can you match each character to its Unicode identity?</h2>
-        <p className="lead">Use the real assignments you inspected. You are matching character identities—not choosing how they are stored.</p>
-      </div>
+      <QuestionPrompt
+        eyebrow="Step 7 · Prove the identity layer"
+        title="Unicode did not renumber the characters ASCII already had."
+        lead="Its first 128 code points are exactly ASCII's assignments, deliberately, so existing text stayed valid. That is enough to work out one code point without being told it."
+      />
 
-      <div className="l5-match-card card">
-        {UNICODE_EXAMPLES.map((example, index) => (
-          <label className="l5-match-row" key={example.id}>
-            <span className="l5-match-symbol">{example.symbol}</span>
-            <span>→</span>
-            <select
-              value={matches[index] ?? ""}
-              onChange={(event) => onMatch(index, event.target.value)}
-              aria-label={`Unicode code point for ${example.symbol}`}
-            >
-              <option value="" disabled>Choose code point</option>
-              {UNICODE_EXAMPLES.map((option) => {
-                const notation = toUnicodeNotation(option.decimal);
-                return <option value={notation} key={notation}>{notation}</option>;
-              })}
-            </select>
-            <small>{example.name}</small>
-          </label>
-        ))}
+      <div className="card l5-derive-card">
+        <div className="l5-derive-given">
+          <div><small>Given</small><b>Unicode code points 0–127 = ASCII</b></div>
+          <div><small>Wanted</small><b>the code point for A</b></div>
+        </div>
 
-        {allSelected && !allCorrect && <p className="l5-error">At least one identity is mismatched. Revisit the assignments before moving on.</p>}
-        {allCorrect && <div className="feedback success-feedback l5-inline-success"><div><b>All five identities match.</b><span>The same standard can name characters from very different parts of the repertoire.</span></div></div>}
-      </div>
+        <h3 className="l5-decision-question">Without looking back: which number is it?</h3>
+        <div className="l5-derive-entry">
+          <span className="l5-derive-symbol">A</span>
+          <span>→</span>
+          <input
+            className={`l5-derive-input${solved ? " right" : ""}${touched && !solved ? " wrong" : ""}`}
+            type="number"
+            min={0}
+            max={1114111}
+            value={asciiInput}
+            onChange={(event) => onAsciiInputChange(event.target.value)}
+            aria-label="Unicode code point for the letter A"
+            placeholder="?"
+          />
+        </div>
 
-      {allCorrect && (
-        <div className="l5-final-question">
-          <h3 className="l5-decision-question">What has Unicode solved at this point?</h3>
-          <div className="l5-choice-grid">
-            <ChoiceCard variant="large" selected={finalAnswer === "bytes"} onClick={() => onFinalAnswer("bytes")}>
-              <b>The final bytes</b><span>Every code point directly specifies its stored byte sequence.</span>
-            </ChoiceCard>
-            <ChoiceCard variant="large" selected={finalAnswer === "identity"} onClick={() => onFinalAnswer("identity")}>
-              <b>Shared character identity</b><span>We can agree which encoded character a code point refers to.</span>
-            </ChoiceCard>
-            <ChoiceCard variant="large" selected={finalAnswer === "size"} onClick={() => onFinalAnswer("size")}>
-              <b>One fixed storage size</b><span>Every Unicode character now takes the same amount of memory.</span>
-            </ChoiceCard>
+        {touched && !solved && (
+          <Feedback tone="nudge">
+            Not the value ASCII published for A. You encoded a word with it two screens ago — the uppercase run starts there.
+          </Feedback>
+        )}
+
+        {solved && (
+          <div className="l5-derive-result">
+            <code>{toUnicodeNotation(ASCII_A)}</code>
+            <p>Same character, same number as ASCII, now with a name inside a system that also has room for {ROCKET_EXAMPLE.symbol}.</p>
           </div>
+        )}
+      </div>
 
-          {finalAnswer === "bytes" && <Feedback tone="nudge">That is the next problem. The code point names the Unicode position; an encoding still has to map that identity to code units and bytes.</Feedback>}
-          {finalAnswer === "size" && <Feedback tone="nudge">Unicode identity does not require every character to use one fixed amount of storage. Storage belongs to the encoding layer we have not built yet.</Feedback>}
-          {finalAnswer === "identity" && (
-            <Feedback tone="success">
-              <div><b>Exactly: identity.</b><span>You can now distinguish “which character is this?” from “how is that identity encoded in memory?”</span></div>
-              <button className="primary-button" onClick={onFinish}>Complete Lesson 05 →</button>
-            </Feedback>
+      {solved && (
+        <div className="l5-recall-block">
+          <h2 className="l5-decision-question">Unicode says {ROCKET_EXAMPLE.symbol} is {ROCKET_EXAMPLE.notation}. What has that settled, and what has it deliberately not?</h2>
+          <TextRecall
+            label="Commit your answer before the principle appears."
+            value={recallText}
+            placeholder="Two short sentences are plenty."
+            principle="It has settled identity: everyone now agrees which character that number refers to, anywhere in the world. It has not settled storage — the code point does not say how many bytes are used or what those bytes contain. That is a separate rule, and 128640 is far too large for one byte to hold."
+            committed={recallCommitted}
+            assessment={recallAssessment}
+            onChange={onRecallChange}
+            onCommit={onRecallCommit}
+            onAssess={onRecallAssess}
+            onRewrite={onRecallRewrite}
+          />
+
+          {recallAssessment !== null && (
+            <>
+              <Feedback tone="success">
+                <div>
+                  <b>Identity, not storage.</b>
+                  <span>You can now keep &ldquo;which character is this?&rdquo; apart from &ldquo;how does that identity become bytes?&rdquo; — which is the whole of the next lesson.</span>
+                </div>
+              </Feedback>
+              <button className="primary-button l5-main-action" onClick={onFinish}>Complete Lesson 05 →</button>
+            </>
           )}
         </div>
       )}

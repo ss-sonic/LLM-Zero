@@ -1,55 +1,69 @@
 "use client";
 
+import { Feedback } from "../../../components/ui/Feedback";
+import { QuestionPrompt } from "../../../components/ui/QuestionPrompt";
 import { CAT_ASCII } from "../config";
 
-const target = ["C", "A", "T"] as const;
-const options = [65, 66, 67, 84, 97];
+const TARGET = ["C", "A", "T"] as const;
 
+/**
+ * A construction, not a menu.
+ *
+ * Offering five candidate numbers let a learner finish by elimination. Typing the
+ * values means reading the standard's structure — uppercase letters run
+ * consecutively from A = 65 — and working T out rather than spotting it.
+ */
 export function EncodeCatStep({
   values,
   sent,
-  onChoose,
+  onChange,
   onSend,
   onContinue,
 }: {
-  values: Array<number | null>;
+  values: string[];
   sent: boolean;
-  onChoose: (index: number, value: number) => void;
+  onChange: (index: number, value: string) => void;
   onSend: () => void;
   onContinue: () => void;
 }) {
-  const expected = target.map((symbol) => CAT_ASCII[symbol]);
-  const allSelected = values.every((value) => value !== null);
-  const correct = expected.every((value, index) => values[index] === value);
+  const expected = TARGET.map((symbol) => CAT_ASCII[symbol]);
+  const entered = values.map((value) => value.trim());
+  const allFilled = entered.every((value) => value !== "");
+  const matches = expected.map((value, index) => Number(entered[index]) === value);
+  const correct = allFilled && matches.every(Boolean);
 
   return (
     <div className="screen-layout centered-screen wide-screen l3-screen">
-      <div className="screen-copy centered-copy compact-copy">
-        <p className="eyebrow">Step 6 · Encode with ASCII</p>
-        <h2>Can you send CAT using ASCII numbers only?</h2>
-        <p className="lead">Look up each character in the same published rulebook. The receiver will use that same rulebook in reverse.</p>
-      </div>
+      <QuestionPrompt
+        eyebrow="Step 6 · Encode with ASCII"
+        title="Can you send CAT using ASCII numbers only?"
+        lead="No table on this screen. Use what the standard's structure tells you: the uppercase letters were deliberately laid out in one consecutive run."
+      />
 
       <div className="l3-cat-card card">
         <div className="l3-cat-slots">
-          {target.map((symbol, index) => (
-            <div className="l3-cat-slot" key={`${symbol}-${index}`}>
+          {TARGET.map((symbol, index) => (
+            <label className="l3-cat-slot" key={`${symbol}-${index}`}>
               <strong>{symbol}</strong><span>↓ ASCII ↓</span>
-              <div className="l3-number-options">
-                {options.map((option) => (
-                  <button
-                    className={values[index] === option ? "selected" : ""}
-                    key={option}
-                    onClick={() => onChoose(index, option)}
-                    aria-label={`Use ASCII value ${option} for ${symbol}`}
-                  >{option}</button>
-                ))}
-              </div>
-            </div>
+              <input
+                className={`l3-cat-input${allFilled && !matches[index] ? " wrong" : ""}${matches[index] ? " right" : ""}`}
+                type="number"
+                min={0}
+                max={127}
+                value={values[index]}
+                onChange={(event) => onChange(index, event.target.value)}
+                aria-label={`ASCII value for ${symbol}`}
+                placeholder="?"
+              />
+            </label>
           ))}
         </div>
 
-        {allSelected && !correct && <p className="l3-error">At least one value does not match ASCII. Hint: C is 67, A is 65, and uppercase letters live in the 65–90 range.</p>}
+        {allFilled && !correct && (
+          <Feedback tone="nudge">
+            At least one value is not what ASCII published. A is 65 and the uppercase run continues one number at a time from there — count to the letter you need.
+          </Feedback>
+        )}
 
         {correct && !sent && (
           <div className="l3-ready-send">
@@ -71,7 +85,7 @@ export function EncodeCatStep({
 
       {sent && (
         <div className="feedback success-feedback">
-          <div><b>That is ASCII doing its job.</b><span>The machines did not need to invent a new mapping for this message. They already shared the standard.</span></div>
+          <div><b>That is ASCII doing its job.</b><span>Neither machine invented anything for this message. They already shared the standard — and you could produce it from the standard&apos;s structure alone.</span></div>
           <button className="primary-button" onClick={onContinue}>Now try to break ASCII →</button>
         </div>
       )}

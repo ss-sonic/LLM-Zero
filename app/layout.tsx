@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "../styles/lesson-shell.css";
 import "../styles/home.css";
+import "../styles/review.css";
 import "../curriculum/01-character-representation/styles.css";
 import "../curriculum/02-shared-character-table/styles.css";
 import "../curriculum/03-ascii/styles.css";
@@ -10,6 +11,7 @@ import "../curriculum/05-unicode-code-points/styles.css";
 import "../curriculum/06-code-points-vs-bytes/styles.css";
 import "../curriculum/06-code-points-vs-bytes/completion.css";
 import "../curriculum/06a-hexadecimal/styles.css";
+import "../curriculum/07-utf-8/styles.css";
 import "../styles/lesson-typography.css";
 
 const title = "LLM Zero — Learn LLMs from First Principles";

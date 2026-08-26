@@ -10,6 +10,8 @@ export type LessonPlayerProps = {
   lessonNumber?: number;
   /** Replaces the "Lesson NN" rail label, e.g. for interaction labs. */
   kicker?: string;
+  /** Enables per-screen learner feedback. Omitted by labs, which are not lessons. */
+  lessonSlug?: string;
   title: string;
   stepLabels: string[];
   currentStep: number;
@@ -24,6 +26,7 @@ export type LessonPlayerProps = {
 export function LessonPlayer({
   lessonNumber,
   kicker,
+  lessonSlug,
   title,
   stepLabels,
   currentStep,
@@ -49,7 +52,14 @@ export function LessonPlayer({
       <LessonStage currentStep={currentStep} dark={darkStage}>
         {children}
       </LessonStage>
-      <LessonFooter currentStep={currentStep} stepCount={stepLabels.length} onBack={onBack} />
+      <LessonFooter
+        currentStep={currentStep}
+        stepCount={stepLabels.length}
+        stepLabel={stepLabels[currentStep] ?? ""}
+        lessonSlug={lessonSlug}
+        lessonTitle={title}
+        onBack={onBack}
+      />
     </main>
   );
 }

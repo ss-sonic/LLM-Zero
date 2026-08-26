@@ -1,3 +1,5 @@
+import type { ReviewPrompt } from "../types";
+
 export const ASCII_STEPS = [
   "Scale the agreement",
   "Publish a standard",
@@ -34,3 +36,24 @@ export const ASCII_BOUNDARY_SAMPLES = [
   { id: "chinese", label: "你好", text: "你好" },
   { id: "rocket", label: "🚀", text: "🚀" },
 ] as const;
+
+export const ASCII_REVIEW: ReviewPrompt[] = [
+  {
+    id: "l3-ascii-t",
+    lessonSlug: "ascii",
+    source: "Lesson 03 · ASCII",
+    kind: "construct",
+    context: "ASCII put the uppercase letters in one consecutive run beginning at A = 65.",
+    question: "What is the ASCII value for T?",
+    answer: "84",
+    principle: "T is the 20th letter, so it sits 19 places after A: 65 + 19 = 84. The starting number was a convention; everything after it follows from the run being consecutive, which is exactly why the layout was designed that way.",
+  },
+  {
+    id: "l3-why-publish",
+    lessonSlug: "ascii",
+    source: "Lesson 03 · ASCII",
+    kind: "recall",
+    question: "Private agreements already let two machines exchange text. So what did publishing one standard change?",
+    principle: "Private agreements have to be renegotiated for every new pair of machines, and a machine can only talk to the ones it has negotiated with. One published rulebook lets machines that never met exchange text. It did not make the rulebook large enough for the world's writing systems — that is a separate problem.",
+  },
+];

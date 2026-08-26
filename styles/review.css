@@ -1,0 +1,116 @@
+/* Spaced review — a course-level surface, not a lesson. */
+
+.review-callout {
+  margin: 30px 0 0;
+  border: 1px solid var(--accent);
+  border-radius: 22px;
+  background: var(--accent-soft);
+  padding: 24px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.review-callout.waiting { border-color: var(--line); background: var(--card); }
+.review-callout > div { display: grid; gap: 6px; }
+.review-callout small {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: 10px;
+  font-weight: 800;
+}
+.review-callout.waiting small { color: var(--muted); }
+.review-callout b { font-size: 20px; letter-spacing: -.02em; }
+.review-callout p { margin: 0; max-width: 62ch; color: var(--muted); line-height: 1.5; font-size: 14px; }
+.review-callout .primary-button { flex-shrink: 0; }
+
+.review-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--paper);
+}
+.review-kicker {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: 10px;
+  font-weight: 800;
+}
+.review-stage {
+  padding: 40px 24px 64px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+}
+
+.review-card, .review-empty {
+  width: min(760px, 100%);
+  padding: 40px;
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+}
+.review-empty { justify-items: center; text-align: center; }
+.review-empty h1 { margin: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.03em; text-wrap: balance; }
+.review-empty p { margin: 0; max-width: 56ch; color: var(--muted); line-height: 1.6; }
+.review-next-due { font-weight: 700; }
+
+.review-context {
+  margin: 0;
+  border-left: 3px solid var(--line);
+  padding-left: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.review-question {
+  margin: 0;
+  font-size: clamp(23px, 3vw, 33px);
+  line-height: 1.16;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+
+.review-entry { width: 100%; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.review-entry input {
+  flex: 1 1 220px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 14px 16px;
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 19px;
+  font-weight: 700;
+}
+.review-entry input:disabled { opacity: .6; }
+
+.review-answer {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+}
+.review-answer-row { display: flex; align-items: baseline; gap: 14px; }
+.review-answer-row small {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: 10px;
+  font-weight: 800;
+}
+.review-answer-row strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; }
+.review-answer p { margin: 0; color: var(--muted); line-height: 1.6; }
+
+.review-advance { justify-self: start; }
+
+@media (max-width: 720px) {
+  .review-callout { flex-direction: column; align-items: stretch; }
+  .review-card, .review-empty { padding: 26px 20px; }
+  .review-stage { padding: 24px 14px 48px; }
+}

@@ -181,3 +181,31 @@
   .l3-standard-success { grid-template-columns: 1fr; }
   .l3-standard-success > p, .l3-standard-success > button { grid-column: auto; }
 }
+
+/* Step 6 · typed ASCII construction. */
+.l3-cat-input {
+  width: 110px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 12px 10px;
+  color: var(--ink);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 24px;
+  font-weight: 800;
+}
+.l3-cat-input.right { border-color: var(--accent); color: var(--accent); }
+.l3-cat-input.wrong { border-color: #d98b74; }
+
+/* Step 7 · the retrieval that closes the lesson. */
+.l3-recall-block { width: min(880px, 100%); margin-top: 22px; display: grid; gap: 16px; justify-items: center; }
+.l3-decision-question {
+  margin: 0 auto;
+  max-width: 780px;
+  font-size: clamp(21px, 2.6vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -.03em;
+  text-align: center;
+  text-wrap: balance;
+}

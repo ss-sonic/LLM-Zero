@@ -1,0 +1,53 @@
+name: Lesson feedback
+description: Tell us about a screen that did not land — a confusing explanation, a check that felt like guessing, or something that seemed wrong.
+title: "Unclear: "
+labels: ["learner-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you — this is the only signal the project gets about whether an explanation
+        actually works. Every lesson is designed by principle; only you can say whether it landed.
+
+        You do not need to know what the fix is. "I got lost here" is a complete and useful report.
+  - type: input
+    id: screen
+    attributes:
+      label: Which screen
+      description: Pre-filled if you arrived from a lesson.
+      placeholder: "Lesson 03 — screen 6 of 8: Encode CAT"
+    validations:
+      required: true
+  - type: textarea
+    id: confusion
+    attributes:
+      label: What was confusing, or what went wrong?
+      description: What you were trying to do, and where it stopped making sense.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      description: Optional. If you had a guess about the answer, tell us what it was — a wrong guess is often the most useful thing in the report.
+    validations:
+      required: false
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem is it?
+      options:
+        - The explanation did not make sense
+        - I could pass the check without understanding it
+        - I think something here is factually wrong
+        - Something looked broken or was hard to use
+        - Something else
+    validations:
+      required: false
+  - type: input
+    id: url
+    attributes:
+      label: Page
+      placeholder: "/lessons/ascii?step=6"
+    validations:
+      required: false

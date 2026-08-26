@@ -1,0 +1,343 @@
+/* Lesson 07 — Build UTF-8 by hand. */
+
+.l7-screen {
+  gap: 24px;
+  min-height: min(660px, 72vh);
+  justify-content: flex-start;
+  padding-top: 6px;
+}
+
+.l7-main-action { margin-top: 4px; }
+
+.l7-input {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--paper);
+  padding: 11px 12px;
+  width: 132px;
+  color: var(--ink);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 21px;
+  font-weight: 800;
+}
+.l7-input.small { width: 84px; font-size: 19px; }
+.l7-input.tag { width: 108px; font-size: 18px; letter-spacing: .08em; }
+.l7-input.bits { width: 96px; font-size: 17px; letter-spacing: .1em; }
+.l7-input.right { border-color: var(--accent); color: var(--accent); }
+.l7-input.wrong { border-color: #d98b74; }
+
+.l7-decision-question {
+  margin: 0 auto;
+  max-width: 760px;
+  font-size: clamp(20px, 2.5vw, 28px);
+  line-height: 1.18;
+  letter-spacing: -.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Step 1 — the bill */
+.l7-bill { width: min(900px, 100%); padding: 26px; display: grid; gap: 22px; justify-items: center; }
+.l7-bill-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.l7-bill-column {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--paper);
+  padding: 10px 8px;
+  min-width: 62px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+.l7-bill-column strong { font-size: 20px; line-height: 1.1; }
+.l7-bill-column > small { color: var(--muted); font-size: 10px; }
+.l7-bill-column code {
+  width: 100%;
+  border-radius: 7px;
+  background: var(--card);
+  padding: 3px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.l7-bill-column code.empty { background: #efece3; color: #b3ada0; }
+.l7-bill-question { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.l7-bill-question label { color: var(--muted); font-weight: 600; }
+
+/* Step 2 — sizes */
+.l7-size-lab { width: min(720px, 100%); padding: 26px; display: grid; gap: 12px; }
+.l7-size-row {
+  display: grid;
+  grid-template-columns: 52px 90px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  padding: 12px 16px;
+}
+.l7-size-symbol { font-size: 28px; text-align: center; }
+.l7-size-row code { color: var(--muted); font-size: 13px; }
+.l7-size-row b { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 17px; }
+.l7-size-row small { color: var(--muted); font-size: 12px; }
+
+/* Step 3 — the ambiguous stream */
+.l7-stream-lab { width: min(760px, 100%); padding: 30px; display: grid; gap: 18px; justify-items: center; }
+.l7-stream { display: flex; align-items: center; }
+.l7-stream-cell { display: flex; align-items: center; }
+.l7-stream-cell > code {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 18px 24px;
+  font-size: 28px;
+  font-weight: 800;
+}
+.l7-cut {
+  border: 0;
+  background: none;
+  padding: 0 10px;
+  color: #c3bdb0;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+.l7-cut.on { color: var(--accent); }
+.l7-cut:disabled { cursor: default; }
+.l7-stream-hint { margin: 0; color: var(--muted); font-size: 14px; text-align: center; }
+.l7-readings { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l7-reading { border: 1px solid var(--line); border-radius: 16px; background: var(--paper); padding: 16px; display: grid; gap: 10px; }
+.l7-reading.yours { border-color: var(--accent); background: #fdf3ee; }
+.l7-reading small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-reading-glyphs { display: flex; flex-wrap: wrap; gap: 10px; }
+.l7-reading-glyphs span { display: grid; gap: 2px; justify-items: center; min-width: 62px; }
+.l7-reading-glyphs b { font-size: 26px; line-height: 1.1; }
+.l7-reading-glyphs em { color: var(--muted); font-size: 9px; font-style: normal; text-align: center; line-height: 1.3; }
+.l7-turn { max-width: 62ch; margin: 0; color: var(--ink); font-size: 17px; line-height: 1.55; text-align: center; text-wrap: balance; }
+
+/* Step 4 — the free bit */
+.l7-free-bit { width: min(780px, 100%); padding: 28px; display: grid; gap: 20px; justify-items: center; }
+.l7-recall-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.l7-recall-line label { color: var(--muted); font-weight: 600; }
+.l7-bit-reveal { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.l7-bit-reveal > div { border: 1px solid var(--line); border-radius: 14px; background: var(--paper); padding: 14px; display: grid; gap: 6px; justify-items: center; }
+.l7-bit-reveal small { color: var(--muted); font-size: 11px; }
+.l7-bit-reveal code { font-size: 19px; font-weight: 800; letter-spacing: .12em; }
+.l7-spare { color: var(--accent); }
+.l7-reveal-copy { max-width: 60ch; margin: 0; color: var(--muted); line-height: 1.6; text-align: center; }
+.l7-claim {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  background: #fdf3ee;
+  padding: 16px 20px;
+}
+.l7-claim code { color: var(--accent); font-size: 21px; font-weight: 800; letter-spacing: .1em; }
+.l7-claim span { max-width: 44ch; color: var(--ink); font-size: 14px; line-height: 1.5; }
+.l7-second-task { width: 100%; border-top: 1px solid var(--line); padding-top: 20px; display: grid; gap: 14px; justify-items: center; }
+.l7-bit-toggle { display: flex; align-items: center; gap: 16px; }
+.l7-bit {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 14px 22px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 26px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.l7-bit.on { border-color: var(--accent); background: var(--accent); color: #fff; }
+.l7-bit-toggle code { font-size: 20px; letter-spacing: .1em; }
+
+/* Step 5 — tags */
+.l7-tag-lab { width: min(780px, 100%); padding: 28px; display: grid; gap: 18px; justify-items: center; }
+.l7-given {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  padding: 14px 18px;
+}
+.l7-given code { font-size: 19px; font-weight: 800; letter-spacing: .1em; }
+.l7-given span { max-width: 46ch; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l7-rule { max-width: 62ch; margin: 0; color: var(--ink); line-height: 1.6; text-align: center; }
+.l7-rule code { color: var(--accent); font-weight: 800; }
+.l7-tag-table { width: 100%; display: grid; gap: 10px; }
+.l7-tag-row {
+  display: grid;
+  grid-template-columns: 84px auto 1fr;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  padding: 12px 16px;
+}
+.l7-tag-row > small { color: var(--muted); font-weight: 700; font-size: 12px; }
+.l7-tag-row > code { color: #a9a294; font-size: 17px; letter-spacing: .1em; }
+.l7-contrast { width: min(900px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.l7-contrast > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l7-contrast small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-contrast b { line-height: 1.35; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
+.l7-contrast span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l7-contrast .chosen { border-color: var(--accent); background: #fdf3ee; }
+.l7-contrast .chosen small { color: var(--accent); }
+
+/* Step 6 — room */
+.l7-room-lab { width: min(860px, 100%); padding: 26px; display: grid; gap: 10px; }
+.l7-room-row {
+  display: grid;
+  grid-template-columns: 76px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  padding: 12px 16px;
+}
+.l7-room-row > small:first-child { color: var(--muted); font-weight: 700; font-size: 12px; }
+.l7-room-bytes { display: flex; flex-wrap: wrap; gap: 8px; }
+.l7-room-bytes code { border-radius: 8px; background: var(--card); padding: 5px 8px; font-size: 13px; letter-spacing: .06em; }
+.l7-tagbits { color: var(--accent); font-weight: 800; }
+.l7-bands { width: min(900px, 100%); display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.l7-bands > div { border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 14px; display: grid; gap: 5px; }
+.l7-bands small { color: var(--accent); text-transform: uppercase; letter-spacing: .08em; font-size: 9px; font-weight: 800; }
+.l7-bands code { font-size: 14px; font-weight: 700; }
+.l7-bands span { color: var(--muted); font-size: 12px; }
+.l7-ceiling { max-width: 66ch; margin: 0; color: var(--muted); line-height: 1.65; text-align: center; }
+
+/* Step 7 — building the rocket */
+.l7-build { width: min(880px, 100%); padding: 28px; display: grid; gap: 24px; }
+.l7-build-task { display: grid; gap: 12px; justify-items: center; }
+.l7-build-task + .l7-build-task { border-top: 1px solid var(--line); padding-top: 22px; }
+.l7-build-task > small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-build-copy { max-width: 62ch; margin: 0; color: var(--muted); line-height: 1.6; text-align: center; }
+.l7-inline { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.l7-inline label { color: var(--ink); font-weight: 600; }
+.l7-digit-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.l7-digit { display: grid; gap: 6px; justify-items: center; }
+.l7-digit b { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; color: var(--accent); }
+.l7-bitstream { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
+.l7-bitstream code {
+  border-radius: 6px;
+  background: var(--paper);
+  padding: 5px 7px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.l7-byte-builder { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.l7-byte { display: grid; gap: 6px; justify-items: center; }
+.l7-byte > small { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+.l7-byte-shape {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  padding: 8px 10px;
+}
+.l7-byte-shape .l7-tagbits { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 17px; letter-spacing: .1em; }
+.l7-byte-shape .l7-input { padding: 7px 8px; font-size: 16px; }
+.l7-byte-done { color: var(--accent); font-size: 17px; font-weight: 800; }
+.l7-callback { width: min(760px, 100%); border: 1px solid var(--accent); border-radius: 20px; background: #fdf3ee; padding: 22px; display: grid; gap: 12px; justify-items: center; }
+.l7-callback small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-callback-bytes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.l7-callback-bytes code { border-radius: 9px; background: var(--card); padding: 8px 12px; font-size: 15px; font-weight: 700; letter-spacing: .08em; }
+.l7-callback p { max-width: 60ch; margin: 0; color: var(--ink); line-height: 1.6; text-align: center; }
+
+/* Step 8 — splitting a real stream */
+.l7-split-lab { width: min(960px, 100%); padding: 26px; display: grid; gap: 16px; justify-items: center; }
+.l7-byte-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.l7-byte-cell {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  padding: 9px 8px;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  cursor: pointer;
+  transition: border-color .12s ease, background .12s ease;
+}
+.l7-byte-cell code { font-size: 12px; letter-spacing: .04em; }
+.l7-byte-cell b { font-size: 14px; }
+.l7-byte-cell small { color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; }
+.l7-byte-cell.start { border-color: var(--accent); background: #fdf3ee; }
+.l7-byte-cell.start small { color: var(--accent); }
+.l7-byte-cell.continuation { background: #efece3; }
+.l7-byte-cell.wrong { border-color: #d98b74; }
+.l7-split-hint { margin: 0; color: var(--muted); font-size: 13px; text-align: center; }
+.l7-decoded { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.l7-decoded-char { border: 1px solid var(--line); border-radius: 13px; background: var(--card); padding: 10px 14px; display: grid; gap: 3px; justify-items: center; min-width: 58px; }
+.l7-decoded-char b { font-size: 22px; line-height: 1.1; }
+.l7-decoded-char small { color: var(--muted); font-size: 9px; }
+.l7-resync { width: min(820px, 100%); border: 1px solid var(--line); border-radius: 18px; background: var(--card); padding: 20px; display: grid; gap: 12px; justify-items: center; }
+.l7-resync small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-byte-strip.small code { border-radius: 8px; background: var(--paper); padding: 6px 8px; font-size: 12px; }
+.l7-byte-strip.small code.skip { color: #b3ada0; }
+.l7-byte-strip.small code.landed { border: 1px solid var(--accent); color: var(--accent); font-weight: 800; }
+.l7-resync p { max-width: 62ch; margin: 0; color: var(--muted); line-height: 1.6; text-align: center; }
+.l7-recall-block { width: min(900px, 100%); display: grid; gap: 16px; justify-items: center; }
+
+/* Completion */
+.l7-complete-screen { gap: 20px; }
+.l7-final-model {
+  width: min(940px, 100%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.l7-final-model > div { border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 13px 16px; display: grid; gap: 5px; justify-items: center; min-width: 118px; }
+.l7-final-model small { color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l7-final-model strong { font-size: 20px; }
+.l7-final-model code { color: var(--accent); font-size: 15px; font-weight: 700; }
+.l7-final-model > span { color: #b3ada0; }
+.l7-final-bits { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; overflow-wrap: anywhere; }
+.l7-earned { width: min(940px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.l7-earned > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l7-earned small { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-earned b { line-height: 1.4; }
+.l7-earned span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.l7-solved-open { width: min(820px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l7-solved-open > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
+.l7-solved-open small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
+.l7-solved-open b { line-height: 1.45; }
+.next-lesson-card.pending { border-style: dashed; }
+.l7-pending-badge {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.l7-complete-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px; }
+
+@media (max-width: 860px) {
+  .l7-contrast, .l7-earned { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .l7-readings, .l7-solved-open { grid-template-columns: 1fr; }
+  .l7-size-row { grid-template-columns: 40px 1fr auto; row-gap: 8px; }
+  .l7-room-row { grid-template-columns: 1fr auto; row-gap: 10px; }
+  .l7-bill, .l7-build, .l7-split-lab { padding: 18px 12px; }
+  .l7-stream-cell > code { padding: 14px 16px; font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l7-byte-cell { transition: none; }
+}

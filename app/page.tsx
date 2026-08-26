@@ -1,5 +1,6 @@
 import { CourseMap } from "../components/course/CourseMap";
 import { LlmJourney } from "../components/course/LlmJourney";
+import { ReviewCallout } from "../components/course/ReviewCallout";
 
 export default function HomePage() {
   return (
@@ -23,6 +24,8 @@ export default function HomePage() {
         </section>
 
         <LlmJourney />
+
+        <ReviewCallout />
 
         <section className="course-section">
           <div className="course-heading">

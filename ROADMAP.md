@@ -16,18 +16,18 @@ The roadmap tracks two things in parallel:
 - [x] Lesson 05 — Unicode and code points
 - [x] Lesson 06 — A code point is not a byte
 - [x] Foundation bridge — Hexadecimal as compact binary notation (`0000–1111 ↔ 0–F`)
-- [ ] Lesson 07 — Build UTF-8 by hand
+- [x] Lesson 07 — Build UTF-8 by hand
 - [ ] Lesson 08 — UTF-8 vs UTF-16 vs UTF-32
 - [ ] Challenge — Trace a multilingual sentence from symbols to bytes
 
 **Interaction target:** prediction + discrete construction + cross-lesson recall + short learner-produced explanations.
 
-**Retrofit debt.** Lessons 01–05 shipped before the assessment modes existed, so their completion checks are still recognition-only. Lesson 04's private-fix recall is the reference implementation. Outstanding:
+**Retrofit debt — cleared.** Lessons 01–05 shipped before the assessment modes existed, so their completion checks were recognition-only. Lesson 04's private-fix recall was the reference implementation and the rest now match it:
 
-- [ ] Lesson 01 — `FinalCheck` is a two-card recognition check
-- [ ] Lesson 03 — completion check is recognition-only
-- [ ] Lesson 05 — `GlobalIdentityChallenge` matches against a table shown one screen earlier
-- [ ] Lesson 02 — audit for one honest retrieval opportunity
+- [x] Lesson 01 — `FinalCheck` builds the stored byte and derives the receiver's rule from it (Construct ×2)
+- [x] Lesson 02 — the weird-table screen retrieves Lesson 01's principle instead of offering two cards (Recall)
+- [x] Lesson 03 — ASCII values are typed rather than chosen, and the boundary screen retrieves what publishing a standard solved (Construct + Recall)
+- [x] Lesson 05 — the code point for A is derived from ASCII rather than matched against a visible table, and the closing three-card question is now prose recall (Construct + Recall)
 
 ## Phase 2 — Text becomes model input
 
@@ -105,12 +105,27 @@ The roadmap tracks two things in parallel:
 
 **Interaction target:** experiment with real inference knobs, inspect memory/latency tradeoffs, manipulate batches/caches, and connect model mathematics to serving systems.
 
+## Retention
+
+Retrieval inside a lesson happens minutes after the idea was built. Spacing is what makes it last.
+
+- [x] Spaced review (`/review`) — each lesson declares the ideas it wants back; they return a day after the lesson is finished and then at expanding intervals, as construction where the answer is determinate and commit-then-self-assess recall where it is prose
+- [ ] Cross-module review once Phase 2 exists — an idea from Phase 1 should return inside a Phase 2 context, not only on its own
+
+## Learner feedback
+
+Nothing in the loop could tell an author that a screen confuses people; every lesson was designed and reviewed by principle alone.
+
+- [x] Per-screen reporting — every lesson screen links to a pre-filled issue form identifying that exact screen
+- [ ] Triage rhythm — decide how `learner-feedback` issues get read and folded back into lessons
+
 ## Interaction R&D checkpoints
 
 These are format stress tests, not learner prerequisites.
 
 - [x] Continuous-math prototype — gradient descent: live parameter scrubber, loss curve, learner-chosen measurements, and a multi-step numeric derivation (`/labs/gradient-descent`)
-- [ ] Symbolic prototype — rearranging an expression, not evaluating a given one. The gradient lab derives numerically; it does not test symbolic manipulation.
+- [x] Symbolic prototype — rearranging an expression rather than evaluating one: the learner applies operations to both sides and the equation is rewritten by rule, with a live numeric check and an explicit non-zero caveat on every division (`/labs/symbolic-rearrangement`)
+- [ ] Symbolic prototype, part two — expanding brackets and powers, which a chain-rule screen will need and the current engine does not have
 - [ ] Attention prototype — construct and inspect a small attention matrix
 - [ ] Code/build prototype — complete a tiny differentiable component and observe its output
 

@@ -171,3 +171,138 @@
   .base-comparison, .rule-contrast { grid-template-columns: 1fr; }
   .calc-column { flex-basis: 72px; }
 }
+
+/* Step 6 · Prove the idea — the construction that closes the lesson. */
+.l1-proof-screen {
+  gap: 26px;
+  min-height: min(640px, 70vh);
+  justify-content: flex-start;
+  padding-top: 8px;
+}
+
+.l1-proof-lab {
+  width: min(760px, 100%);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.l1-proof-task { display: flex; flex-direction: column; gap: 12px; }
+.l1-proof-task > small {
+  color: #8a8a8a;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 10px;
+  font-weight: 800;
+}
+.l1-proof-task > p { margin: 0; color: #444; line-height: 1.5; }
+
+.l1-place-values, .l1-proof-bits {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+}
+.l1-place-values span {
+  color: #9a9a9a;
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.l1-proof-bit {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 16px 0;
+  color: #555;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, color .12s ease;
+}
+.l1-proof-bit:hover { transform: translateY(-2px); }
+.l1-proof-bit.on { background: var(--accent); border-color: var(--accent); color: #171717; }
+
+.l1-proof-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.l1-proof-total code { color: #777; letter-spacing: .1em; }
+.l1-proof-total b { color: #aaa; }
+.l1-proof-total strong { font-size: 28px; color: #333; }
+.l1-proof-total strong.solved { color: var(--accent); }
+
+.l1-proof-hint { margin: 0; text-align: center; color: #8a8a8a; font-size: 14px; }
+.l1-proof-hint.solved { color: #444; }
+
+.l1-proof-twist { border-top: 1px solid var(--line); padding-top: 22px; }
+.l1-proof-question {
+  margin: 0;
+  font-size: clamp(19px, 2.2vw, 25px);
+  line-height: 1.3;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+
+.l1-proof-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px 0;
+}
+.l1-proof-symbol {
+  font-size: 34px;
+  font-weight: 800;
+  color: #333;
+}
+.l1-proof-rule > span { color: #999; font-size: 22px; }
+
+.l1-proof-verdict {
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 12px;
+}
+.l1-proof-verdict > div {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+}
+.l1-proof-verdict small {
+  color: #8a8a8a;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: 10px;
+  font-weight: 800;
+}
+.l1-proof-verdict strong { font-size: 30px; color: #222; }
+.l1-proof-verdict code { color: #666; font-size: 13px; }
+.l1-proof-shared { border-color: #6c463a; background: #fdf3ee; justify-content: center; }
+.l1-proof-shared code { color: var(--accent); font-size: 15px; letter-spacing: .12em; font-weight: 700; }
+
+.l1-proof-action { margin-top: 4px; }
+
+@media (max-width: 720px) {
+  .l1-proof-lab { padding: 20px 14px; }
+  .l1-place-values, .l1-proof-bits { gap: 5px; }
+  .l1-proof-bit { padding: 12px 0; font-size: 16px; }
+  .l1-proof-verdict { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l1-proof-bit { transition: none; }
+  .l1-proof-bit:hover { transform: none; }
+}

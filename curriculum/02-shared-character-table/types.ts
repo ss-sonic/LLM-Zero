@@ -1,8 +1,9 @@
+import type { RecallAssessment } from "../../components/ui/TextRecall";
+
 export type SymbolKey = "A" | "B" | "C";
 export type MappingTable = Record<SymbolKey, number>;
 export type MismatchReason = "changed" | "rules" | "binary" | null;
 export type ScaleChoice = "instructions" | "agree" | null;
-export type AgreementAnswer = "intrinsic" | "shared" | null;
 
 export type SharedCharacterTablePersistedState = {
   currentStep: number;
@@ -16,7 +17,10 @@ export type SharedCharacterTablePersistedState = {
   sharedSent: boolean;
   weirdApplied: boolean;
   weirdTested: boolean;
-  agreementAnswer: AgreementAnswer;
+  /** Lesson 01's principle, retrieved in the learner's own words. */
+  agreementRecall: string;
+  agreementCommitted: boolean;
+  agreementAssessment: RecallAssessment;
   encodedValues: Array<number | null>;
   messageSent: boolean;
   receiverBroken: boolean;

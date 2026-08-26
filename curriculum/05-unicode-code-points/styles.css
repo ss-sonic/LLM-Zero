@@ -254,3 +254,38 @@
   .l5-match-row small { grid-column: 1 / -1; padding-left: 60px; }
   .l5-solved-vs-open { grid-template-columns: 1fr; }
 }
+
+/* Step 7 · deriving a code point instead of matching one. */
+.l5-derive-card { width: min(720px, 100%); padding: 30px; display: grid; gap: 20px; justify-items: center; }
+.l5-derive-given { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l5-derive-given > div { border: 1px solid var(--line); border-radius: 15px; background: var(--paper); padding: 15px; display: grid; gap: 6px; text-align: left; }
+.l5-derive-given small { color: var(--accent); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l5-derive-given b { line-height: 1.4; font-size: 15px; }
+
+.l5-derive-entry { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.l5-derive-symbol { font-size: 40px; font-weight: 800; }
+.l5-derive-entry > span { color: #999; font-size: 22px; }
+.l5-derive-input {
+  width: 150px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 12px 10px;
+  color: var(--ink);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 26px;
+  font-weight: 800;
+}
+.l5-derive-input.right { border-color: var(--accent); color: var(--accent); }
+.l5-derive-input.wrong { border-color: #d98b74; }
+
+.l5-derive-result { display: grid; gap: 8px; justify-items: center; text-align: center; }
+.l5-derive-result code { color: var(--accent); font-size: 26px; font-weight: 700; letter-spacing: .04em; }
+.l5-derive-result p { margin: 0; max-width: 460px; color: var(--muted); line-height: 1.5; }
+
+.l5-recall-block { width: min(900px, 100%); margin-top: 22px; display: grid; gap: 16px; justify-items: center; }
+
+@media (max-width: 720px) {
+  .l5-derive-given { grid-template-columns: 1fr; }
+}

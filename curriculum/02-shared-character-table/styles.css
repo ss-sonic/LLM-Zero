@@ -116,3 +116,23 @@
 @media (prefers-reduced-motion: reduce) {
   .l2-packet, .l2-instructions { transition: none; animation: none; }
 }
+
+/* Step 5 · the retrieval that closes the loop back to Lesson 01. */
+.l2-question-block { display: grid; gap: 16px; justify-items: center; }
+.l2-decision-question {
+  margin: 0 auto;
+  max-width: 780px;
+  font-size: clamp(21px, 2.6vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+.l2-recall-echo { width: min(760px, 100%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.l2-recall-echo > div { border: 1px solid var(--line); border-radius: 15px; background: var(--card); padding: 17px; display: grid; gap: 7px; text-align: left; }
+.l2-recall-echo small { color: var(--accent); text-transform: uppercase; letter-spacing: .09em; font-size: 9px; font-weight: 800; }
+.l2-recall-echo b { line-height: 1.4; }
+
+@media (max-width: 720px) {
+  .l2-recall-echo { grid-template-columns: 1fr; }
+}

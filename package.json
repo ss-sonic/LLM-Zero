@@ -2,11 +2,16 @@
   "name": "llm-zero",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "tsx --test \"tests/**/*.test.ts\"",
+    "check": "npm run lint && npm run test"
   },
   "dependencies": {
     "@types/node": "^22.10.0",
@@ -16,5 +21,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.12"
   }
 }

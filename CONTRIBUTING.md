@@ -16,6 +16,8 @@ A contribution should ideally pass these tests:
 - **Does it stay at one abstraction level?** Do not jump from bytes to tokenization, or vectors to attention, before the current concept is established.
 - **Can the learner do something?** Prefer prediction, manipulation, inspection, experiments, and puzzles over long passive explanations.
 - **Does the interaction teach?** Animation and interaction should reveal a concept, not merely decorate the page.
+- **Could a learner pass it without understanding it?** If the answer can be found by elimination, or by noticing which option sounds most careful, redesign the check.
+- **Will the idea come back?** A lesson should declare at least one review prompt so what it teaches returns days later, not only during the session.
 
 ## Curriculum philosophy
 
@@ -37,7 +39,9 @@ The repository has explicit ownership boundaries:
 - `components/lesson/` — reusable lesson chrome and guided-navigation UI.
 - `components/ui/` — small UI patterns that have proven reusable.
 - `curriculum/` — lesson content, experiments, steps, and lesson-specific styling.
-- `lib/lesson/` — non-visual reusable mechanics such as persistence, URL navigation, progress guards, and pure helpers.
+- `lib/lesson/` — non-visual reusable mechanics such as persistence, URL navigation, progress guards, and pure helpers. `useLessonProgress` owns the guided-lesson state machine; lessons should not re-implement it.
+- `lib/course/` — course-level mechanics: overall progress and spaced-review scheduling.
+- `tests/` — mirrors the source tree. Anything reusable and non-visual is verified here rather than by review.
 
 A new lesson should normally live in `curriculum/<number>-<slug>/` with a `lesson.tsx`, `steps/`, configuration/types, and lesson-specific styles.
 
@@ -56,7 +60,14 @@ Every guided lesson should preserve these rules:
 - changing the URL cannot unlock a future screen;
 - header/progress/footer remain visible while only the lesson canvas scrolls on overflow.
 
-See [`skills.md`](./skills.md) for the detailed implementation contract.
+See [`skills.md`](./skills.md) for the detailed implementation contract. These rules are enforced by `tests/lesson/progress.test.ts` rather than by inspection — if you change how progression works, that file should fail first.
+
+## Retention and feedback
+
+Two things run alongside the lessons:
+
+- **Spaced review.** Each lesson exports `<LESSON>_REVIEW` prompts from its `config.ts`. They return a day after the lesson is finished and then at expanding intervals at `/review`. A prompt must stand alone with the lesson closed, and must not contain its own answer — a test checks this.
+- **Learner feedback.** Every lesson screen links to a pre-filled issue form naming that screen. Nothing is collected or tracked; the learner chooses to file it. Issues labelled `learner-feedback` are the only direct evidence the project has about whether an explanation lands, and "I passed the check without understanding it" is a design defect worth acting on.
 
 ## Development
 
@@ -68,9 +79,11 @@ npm run dev
 Before opening a pull request:
 
 ```bash
-npm run lint
+npm run check   # type check + tests
 npm run build
 ```
+
+Tests run on `node --test` through `tsx`; add coverage for any new pure helper, scheduling rule, or lab engine you introduce.
 
 ## Pull requests
 
@@ -82,6 +95,8 @@ Keep pull requests focused. For educational changes, explain:
 - what higher-level concepts have deliberately been kept out of scope.
 
 For architecture changes, explain which directory owns the behavior and why it is genuinely reusable.
+
+For changes to lesson mechanics, explain which test would have caught a regression.
 
 ## Accessibility
 

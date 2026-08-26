@@ -58,7 +58,13 @@ Experimental interaction prototypes used to test whether the learning format can
 
 ### `lib/lesson/` and `lib/course/`
 
-Non-visual mechanics that are genuinely reusable: persistence, URL navigation, progress guards, course progress, and small pure utilities. Lesson-specific domain logic belongs with the lesson until another real use case proves the abstraction useful.
+Non-visual mechanics that are genuinely reusable: persistence, URL navigation, progress guards, course progress, spaced review scheduling, and small pure utilities. Lesson-specific domain logic belongs with the lesson until another real use case proves the abstraction useful.
+
+`lib/lesson/useLessonProgress.ts` owns the guided-lesson state machine. A lesson must not re-implement hydration, URL syncing, clamping, persistence, Back/Forward handling, or replay — it passes its own state in and gets it handed back. The rules themselves are pure functions in `lib/lesson/progress.ts` so they are covered by tests rather than by inspection.
+
+### `tests/`
+
+Mirrors the source tree. Everything reusable and non-visual is tested here: the progression contract, persistence, review scheduling, the registry's internal consistency, every lesson's pure helpers, and the labs' engines. Run with `npm run test`; `npm run check` runs the type check and the tests together.
 
 ## 4. Standardize the learning framework, not every experiment
 
@@ -143,6 +149,19 @@ Good retrieval forms:
 - calculate with a rule learned earlier;
 - diagnose a new failure using an old mental model;
 - rebuild a prior result without showing the original table/answer.
+
+### Ideas must come back after the session ends
+
+Retrieval inside a lesson happens minutes after the idea was built, while it is still in the room. That is worth doing and it is not retention. Every lesson therefore declares the ideas it wants back, as `<LESSON>_REVIEW: ReviewPrompt[]` in its own `config.ts`, collected by `curriculum/review.ts` and scheduled by `lib/course/review.ts`.
+
+A review prompt has to survive the lesson being closed:
+
+- it may not lean on anything that was on screen at the time — state the context it needs;
+- it may not contain its own answer (a test enforces this);
+- `construct` prompts have a determinate answer and are machine-checked;
+- `recall` prompts are prose and are never machine-checked, exactly as in a lesson.
+
+Ideas return a day after the lesson is finished, then at expanding intervals. A missed retrieval drops that idea to the shortest interval rather than merely holding it — it is evidence the spacing outran the memory. Every available lesson must contribute at least one prompt.
 
 ### Never machine-grade free-text recall
 
@@ -252,13 +271,21 @@ The course home should maintain a north-star pipeline from visible text through 
 
 Do not add forced “this matters to LLMs because...” paragraphs to every screen. Motivation should come from the persistent map and from real causal dependencies.
 
-## 10. Accessibility and responsive behavior are part of correctness
+## 10. Find out whether it actually worked
+
+Every lesson here is designed by principle and reviewed by principle. Nothing about that tells an author whether a screen lands, and a contributor's own fluency is the least reliable evidence available — the person who wrote the explanation cannot un-know it.
+
+So every lesson screen carries a quiet link to a pre-filled issue form naming that exact screen (`components/lesson/LessonFeedback.tsx`). It is not analytics: nothing is collected, sent, or stored, and the learner decides whether to file anything. Keep it that way. If a future contributor wants usage data, that is a separate decision to be taken in public, not a quiet addition.
+
+Treat `learner-feedback` issues as the highest-quality signal the project gets. A report of the form "I passed the check without understanding it" is a design defect, not a support request.
+
+## 11. Accessibility and responsive behavior are part of correctness
 
 Interactive controls need keyboard access and meaningful accessible names. Do not rely on color alone. Test narrow screens and short laptop viewports. Expanded content must remain reachable without hiding navigation.
 
 For graphs and live numeric interactions, expose the important numeric state in text as well; visuals must not be the only carrier of information.
 
-## 11. Content accuracy and prerequisite closure
+## 12. Content accuracy and prerequisite closure
 
 When introducing standards, history, or precise implementation details, prefer primary specifications and authoritative sources. Keep citations or source notes close to the lesson/content work that relies on them.
 
@@ -274,7 +301,7 @@ Never blur these distinctions:
 
 Do not defer a prerequisite without scheduling where it will be learned. If a lesson says “you do not need to know this yet,” the roadmap must contain the bridge before a later lesson depends on it. Hexadecimal byte notation is explicitly scheduled before hand-building UTF-8.
 
-## 12. New lesson checklist
+## 13. New lesson checklist
 
 Before marking a lesson available:
 
@@ -285,14 +312,17 @@ Before marking a lesson available:
 - include at least one production-oriented mastery check when the concept permits it;
 - identify any genuine prior concept worth retrieving;
 - define explicit unlock conditions;
+- drive progression through `useLessonProgress` rather than a hand-rolled state machine;
 - persist only state needed to meaningfully resume;
 - make Back/Forward and refresh safe;
+- declare at least one review prompt so the lesson's ideas come back later;
 - check the north-star connection without teaching future vocabulary;
 - test tall desktop, short laptop, keyboard, and mobile behavior;
-- run `npm run lint` and `npm run build`;
+- cover any new pure helper in `tests/`;
+- run `npm run check` and `npm run build`;
 - update `ROADMAP.md` when lesson status or prerequisites change.
 
-## 13. AI contributor workflow
+## 14. AI contributor workflow
 
 AI agents should not assume an existing abstraction is correct simply because it exists. Inspect the target lesson and its neighboring layers first.
 
@@ -313,6 +343,7 @@ After editing:
 3. Check refresh/resume behavior if state changed.
 4. Check responsive overflow behavior if layout changed.
 5. Check whether a learner can pass by test-taking pattern recognition rather than understanding.
-6. Run type-check/build CI.
+6. Check that any rule worth stating in this file is enforced by a test rather than by review.
+7. Run `npm run check` and `npm run build`.
 
 When uncertain, prefer a small lesson-specific implementation over a premature framework abstraction.

@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LessonPlayer } from "../../components/lesson/LessonPlayer";
-import { readStepFromUrl, writeStepToUrl } from "../../lib/lesson/navigation";
-import {
-  clearPersistedLessonState,
-  readPersistedLessonState,
-  writePersistedLessonState,
-} from "../../lib/lesson/persistence";
-import { clampStep } from "../../lib/lesson/progress";
+import type { RecallAssessment } from "../../components/ui/TextRecall";
+import { useLessonProgress } from "../../lib/lesson/useLessonProgress";
 import {
   INVENTED_DEFAULT_TABLE,
   INVENTED_SYMBOLS,
@@ -25,9 +20,7 @@ import { NameIdeaStep } from "./steps/NameIdea";
 import { ReadNotationStep } from "./steps/ReadNotation";
 import { WorldSystemStep } from "./steps/WorldSystem";
 import type {
-  ChallengeMatches,
   CodePointAnswer,
-  FinalConceptAnswer,
   InventedSymbol,
   InventedTable,
   RequirementAnswer,
@@ -36,7 +29,6 @@ import type {
 } from "./types";
 
 const STEP_COUNT = UNICODE_CODE_POINT_STEPS.length;
-const CHALLENGE_LENGTH = UNICODE_EXAMPLES.length;
 
 function isInventedTable(value: unknown): value is InventedTable {
   if (!value || typeof value !== "object") return false;
@@ -57,17 +49,7 @@ function safeSelectedId(value: unknown) {
     : UNICODE_EXAMPLES[0].id;
 }
 
-function safeChallengeMatches(value: unknown): ChallengeMatches {
-  if (!Array.isArray(value) || value.length !== CHALLENGE_LENGTH) {
-    return Array.from({ length: CHALLENGE_LENGTH }, () => null);
-  }
-  return value.map((item) => typeof item === "string" ? item : null);
-}
-
 export function UnicodeCodePointLesson() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [highestUnlocked, setHighestUnlocked] = useState(0);
   const [requirementAnswer, setRequirementAnswer] = useState<RequirementAnswer>(null);
   const [inventedTable, setInventedTable] = useState<InventedTable>({ ...INVENTED_DEFAULT_TABLE });
   const [tablePublished, setTablePublished] = useState(false);
@@ -77,45 +59,15 @@ export function UnicodeCodePointLesson() {
   const [notationSeenIds, setNotationSeenIds] = useState<string[]>([UNICODE_EXAMPLES[0].id]);
   const [notationSelectedId, setNotationSelectedId] = useState<string>(UNICODE_EXAMPLES[0].id);
   const [storageAnswer, setStorageAnswer] = useState<StorageAnswer>(null);
-  const [challengeMatches, setChallengeMatches] = useState<ChallengeMatches>(Array.from({ length: CHALLENGE_LENGTH }, () => null));
-  const [finalConceptAnswer, setFinalConceptAnswer] = useState<FinalConceptAnswer>(null);
+  const [asciiCodePointInput, setAsciiCodePointInput] = useState("");
+  const [identityRecall, setIdentityRecall] = useState("");
+  const [identityCommitted, setIdentityCommitted] = useState(false);
+  const [identityAssessment, setIdentityAssessment] = useState<RecallAssessment>(null);
 
-  useEffect(() => {
-    const saved = readPersistedLessonState<UnicodeCodePointPersistedState>(UNICODE_CODE_POINT_STORAGE_KEY);
-    const restoredHighest = clampStep(
-      typeof saved?.highestUnlocked === "number" ? saved.highestUnlocked : 0,
-      STEP_COUNT - 1,
-      STEP_COUNT,
-    );
-    const requestedStep = readStepFromUrl();
-    const restoredCurrent = clampStep(
-      requestedStep ?? (typeof saved?.currentStep === "number" ? saved.currentStep : 0),
-      restoredHighest,
-      STEP_COUNT,
-    );
-
-    setCurrentStep(restoredCurrent);
-    setHighestUnlocked(restoredHighest);
-    setRequirementAnswer(saved?.requirementAnswer === "local" || saved?.requirementAnswer === "shared" || saved?.requirementAnswer === "reuse" ? saved.requirementAnswer : null);
-    setInventedTable(isInventedTable(saved?.inventedTable) ? saved.inventedTable : { ...INVENTED_DEFAULT_TABLE });
-    setTablePublished(saved?.tablePublished === true);
-    setTableSent(saved?.tableSent === true);
-    setCodePointAnswer(saved?.codePointAnswer === "bytes" || saved?.codePointAnswer === "position" || saved?.codePointAnswer === "picture" ? saved.codePointAnswer : null);
-    setUnicodeRevealed(saved?.unicodeRevealed === true);
-    setNotationSeenIds(safeSeenIds(saved?.notationSeenIds));
-    setNotationSelectedId(safeSelectedId(saved?.notationSelectedId));
-    setStorageAnswer(saved?.storageAnswer === "stored" || saved?.storageAnswer === "identity" ? saved.storageAnswer : null);
-    setChallengeMatches(safeChallengeMatches(saved?.challengeMatches));
-    setFinalConceptAnswer(saved?.finalConceptAnswer === "bytes" || saved?.finalConceptAnswer === "identity" || saved?.finalConceptAnswer === "size" ? saved.finalConceptAnswer : null);
-    writeStepToUrl(restoredCurrent, "replace");
-    setHasHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hasHydrated) return;
-    const state: UnicodeCodePointPersistedState = {
-      currentStep,
-      highestUnlocked,
+  const progress = useLessonProgress<UnicodeCodePointPersistedState>({
+    storageKey: UNICODE_CODE_POINT_STORAGE_KEY,
+    stepCount: STEP_COUNT,
+    lessonState: {
       requirementAnswer,
       inventedTable,
       tablePublished,
@@ -125,40 +77,54 @@ export function UnicodeCodePointLesson() {
       notationSeenIds,
       notationSelectedId,
       storageAnswer,
-      challengeMatches,
-      finalConceptAnswer,
-    };
-    writePersistedLessonState(UNICODE_CODE_POINT_STORAGE_KEY, state);
-  }, [hasHydrated, currentStep, highestUnlocked, requirementAnswer, inventedTable, tablePublished, tableSent, codePointAnswer, unicodeRevealed, notationSeenIds, notationSelectedId, storageAnswer, challengeMatches, finalConceptAnswer]);
+      asciiCodePointInput,
+      identityRecall,
+      identityCommitted,
+      identityAssessment,
+    },
+    onRestore: (saved) => {
+      setRequirementAnswer(saved?.requirementAnswer === "local" || saved?.requirementAnswer === "shared" || saved?.requirementAnswer === "reuse" ? saved.requirementAnswer : null);
+      setInventedTable(isInventedTable(saved?.inventedTable) ? saved.inventedTable : { ...INVENTED_DEFAULT_TABLE });
+      setTablePublished(saved?.tablePublished === true);
+      setTableSent(saved?.tableSent === true);
+      setCodePointAnswer(saved?.codePointAnswer === "bytes" || saved?.codePointAnswer === "position" || saved?.codePointAnswer === "picture" ? saved.codePointAnswer : null);
+      setUnicodeRevealed(saved?.unicodeRevealed === true);
+      setNotationSeenIds(safeSeenIds(saved?.notationSeenIds));
+      setNotationSelectedId(safeSelectedId(saved?.notationSelectedId));
+      setStorageAnswer(saved?.storageAnswer === "stored" || saved?.storageAnswer === "identity" ? saved.storageAnswer : null);
 
-  useEffect(() => {
-    if (!hasHydrated) return;
-    function handlePopState() {
-      const requested = readStepFromUrl();
-      if (requested === null) return;
-      const safeStep = clampStep(requested, highestUnlocked, STEP_COUNT);
-      setCurrentStep(safeStep);
-      if (safeStep !== requested) writeStepToUrl(safeStep, "replace");
-    }
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [hasHydrated, highestUnlocked]);
-
-  function unlock(step: number) {
-    setHighestUnlocked((current) => Math.min(STEP_COUNT - 1, Math.max(current, step)));
-  }
-
-  function goTo(step: number, mode: "push" | "replace" = "push") {
-    if (step < 0 || step > highestUnlocked) return;
-    setCurrentStep(step);
-    if (hasHydrated) writeStepToUrl(step, mode);
-  }
-
-  function unlockAndGo(step: number) {
-    unlock(step);
-    setCurrentStep(step);
-    if (hasHydrated) writeStepToUrl(step, "push");
-  }
+      // Learners who already finished the old match-and-choose check keep their
+      // progress rather than being sent back through a screen they completed.
+      const clearedLegacyCheck = saved?.finalConceptAnswer === "identity";
+      setAsciiCodePointInput(
+        typeof saved?.asciiCodePointInput === "string"
+          ? saved.asciiCodePointInput
+          : clearedLegacyCheck ? "65" : "",
+      );
+      setIdentityRecall(typeof saved?.identityRecall === "string" ? saved.identityRecall : "");
+      setIdentityCommitted(saved?.identityCommitted === true || clearedLegacyCheck);
+      setIdentityAssessment(
+        saved?.identityAssessment === "matched" || saved?.identityAssessment === "missed"
+          ? saved.identityAssessment
+          : clearedLegacyCheck ? "matched" : null,
+      );
+    },
+    onReset: () => {
+      setRequirementAnswer(null);
+      setInventedTable({ ...INVENTED_DEFAULT_TABLE });
+      setTablePublished(false);
+      setTableSent(false);
+      setCodePointAnswer(null);
+      setUnicodeRevealed(false);
+      setNotationSeenIds([UNICODE_EXAMPLES[0].id]);
+      setNotationSelectedId(UNICODE_EXAMPLES[0].id);
+      setStorageAnswer(null);
+      setAsciiCodePointInput("");
+      setIdentityRecall("");
+      setIdentityCommitted(false);
+      setIdentityAssessment(null);
+    },
+  });
 
   function updateInventedValue(symbol: InventedSymbol, value: number) {
     setInventedTable((current) => ({ ...current, [symbol]: value }));
@@ -171,34 +137,16 @@ export function UnicodeCodePointLesson() {
     setNotationSeenIds((current) => current.includes(id) ? current : [...current, id]);
   }
 
-  function restartLesson() {
-    setCurrentStep(0);
-    setHighestUnlocked(0);
-    setRequirementAnswer(null);
-    setInventedTable({ ...INVENTED_DEFAULT_TABLE });
-    setTablePublished(false);
-    setTableSent(false);
-    setCodePointAnswer(null);
-    setUnicodeRevealed(false);
-    setNotationSeenIds([UNICODE_EXAMPLES[0].id]);
-    setNotationSelectedId(UNICODE_EXAMPLES[0].id);
-    setStorageAnswer(null);
-    setChallengeMatches(Array.from({ length: CHALLENGE_LENGTH }, () => null));
-    setFinalConceptAnswer(null);
-    clearPersistedLessonState(UNICODE_CODE_POINT_STORAGE_KEY);
-    if (hasHydrated) writeStepToUrl(0, "replace");
-  }
-
-  if (!hasHydrated) return <main className="app-shell" aria-busy="true" />;
+  if (!progress.hasHydrated) return <main className="app-shell" aria-busy="true" />;
 
   let screen;
-  switch (currentStep) {
+  switch (progress.currentStep) {
     case 0:
       screen = (
         <WorldSystemStep
           answer={requirementAnswer}
-          onAnswer={(answer) => { setRequirementAnswer(answer); if (answer === "shared") unlock(1); }}
-          onContinue={() => unlockAndGo(1)}
+          onAnswer={(answer) => { setRequirementAnswer(answer); if (answer === "shared") progress.unlock(1); }}
+          onContinue={() => progress.unlockAndGo(1)}
         />
       );
       break;
@@ -211,7 +159,7 @@ export function UnicodeCodePointLesson() {
           onChange={updateInventedValue}
           onPublish={() => { setTablePublished(true); setTableSent(false); }}
           onSend={() => setTableSent(true)}
-          onContinue={() => unlockAndGo(2)}
+          onContinue={() => progress.unlockAndGo(2)}
         />
       );
       break;
@@ -219,51 +167,57 @@ export function UnicodeCodePointLesson() {
       screen = (
         <NameIdeaStep
           answer={codePointAnswer}
-          onAnswer={(answer) => { setCodePointAnswer(answer); if (answer === "position") unlock(3); }}
-          onContinue={() => unlockAndGo(3)}
+          onAnswer={(answer) => { setCodePointAnswer(answer); if (answer === "position") progress.unlock(3); }}
+          onContinue={() => progress.unlockAndGo(3)}
         />
       );
       break;
     case 3:
-      screen = <MeetUnicodeStep revealed={unicodeRevealed} onReveal={() => setUnicodeRevealed(true)} onContinue={() => unlockAndGo(4)} />;
+      screen = <MeetUnicodeStep revealed={unicodeRevealed} onReveal={() => setUnicodeRevealed(true)} onContinue={() => progress.unlockAndGo(4)} />;
       break;
     case 4:
-      screen = <ReadNotationStep selectedId={notationSelectedId} seenIds={notationSeenIds} onSelect={selectNotation} onContinue={() => unlockAndGo(5)} />;
+      screen = <ReadNotationStep selectedId={notationSelectedId} seenIds={notationSeenIds} onSelect={selectNotation} onContinue={() => progress.unlockAndGo(5)} />;
       break;
     case 5:
       screen = (
         <IdentityStorageStep
           answer={storageAnswer}
-          onAnswer={(answer) => { setStorageAnswer(answer); if (answer === "identity") unlock(6); }}
-          onContinue={() => unlockAndGo(6)}
+          onAnswer={(answer) => { setStorageAnswer(answer); if (answer === "identity") progress.unlock(6); }}
+          onContinue={() => progress.unlockAndGo(6)}
         />
       );
       break;
     case 6:
       screen = (
         <GlobalIdentityChallengeStep
-          matches={challengeMatches}
-          finalAnswer={finalConceptAnswer}
-          onMatch={(index, value) => setChallengeMatches((current) => current.map((item, itemIndex) => itemIndex === index ? value : item))}
-          onFinalAnswer={(answer) => { setFinalConceptAnswer(answer); if (answer === "identity") unlock(7); }}
-          onFinish={() => unlockAndGo(7)}
+          asciiInput={asciiCodePointInput}
+          recallText={identityRecall}
+          recallCommitted={identityCommitted}
+          recallAssessment={identityAssessment}
+          onAsciiInputChange={setAsciiCodePointInput}
+          onRecallChange={setIdentityRecall}
+          onRecallCommit={() => setIdentityCommitted(true)}
+          onRecallAssess={(assessment) => { setIdentityAssessment(assessment); progress.unlock(7); }}
+          onRecallRewrite={() => { setIdentityCommitted(false); setIdentityAssessment(null); }}
+          onFinish={() => progress.unlockAndGo(7)}
         />
       );
       break;
     default:
-      screen = <CompleteStep onRestart={restartLesson} />;
+      screen = <CompleteStep onRestart={progress.restart} />;
   }
 
   return (
     <LessonPlayer
       lessonNumber={5}
+      lessonSlug="unicode"
       title="Unicode and code points: identity before storage"
       stepLabels={UNICODE_CODE_POINT_STEPS}
-      currentStep={currentStep}
-      highestUnlocked={highestUnlocked}
-      onNavigate={(step) => goTo(step)}
-      onBack={() => goTo(Math.max(0, currentStep - 1))}
-      onRestart={restartLesson}
+      currentStep={progress.currentStep}
+      highestUnlocked={progress.highestUnlocked}
+      onNavigate={(step) => progress.goTo(step)}
+      onBack={progress.back}
+      onRestart={progress.restart}
     >
       {screen}
     </LessonPlayer>
