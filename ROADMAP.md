@@ -18,9 +18,24 @@ The roadmap tracks two things in parallel:
 - [x] Foundation bridge — Hexadecimal as compact binary notation (`0000–1111 ↔ 0–F`)
 - [x] Lesson 07 — Build UTF-8 by hand
 - [x] Lesson 08 — UTF-8 vs UTF-16 vs UTF-32
-- [ ] Challenge — Trace a multilingual sentence from symbols to bytes
+- [x] Challenge — Trace a multilingual sentence from symbols to bytes
 
-**Interaction target:** prediction + discrete construction + cross-lesson recall + short learner-produced explanations.
+**Phase 1 is complete.** The challenge introduces no new concept. It tests the four things a
+lesson structurally cannot, because every lesson named the link the learner was working on:
+
+- **composition** — the learner lays the five pipeline stages out in order before using them,
+  and is not told which stage they are on again;
+- **branching** — one sentence, `café 你好 🚀`, that exercises all four UTF-8 forms, where the
+  earlier running example had no three-byte character;
+- **the reverse direction** — an unseen stream split and decoded back to characters, which
+  Lesson 07 stopped short of;
+- **diagnosis** — real ISO-8859-1 mojibake where every byte is correct and the reader guessed,
+  which is Lesson 02's disagreement one level down.
+
+It closes on a character the learner chooses themselves, so the final check is the only one in
+the course whose content nobody authored.
+
+**Interaction target:** prediction + discrete construction + cross-lesson recall + short learner-produced explanations. Reached, plus two new verbs the challenge needed: **arranging** a sequence from scrambled parts, and **free learner input** validated against a computed answer.
 
 **Retrofit debt — cleared.** Lessons 01–05 shipped before the assessment modes existed, so their completion checks were recognition-only. Lesson 04's private-fix recall was the reference implementation and the rest now match it:
 
@@ -130,3 +145,12 @@ These are format stress tests, not learner prerequisites.
 - [ ] Code/build prototype — complete a tiny differentiable component and observe its output
 
 A phase should not standardize an interaction pattern until at least one real prototype demonstrates that the format can carry the concept without collapsing into multiple-choice recognition.
+
+## Known verification debt
+
+Layout is reviewed by principle and by responsive markup, which is not the same as looking at it.
+These are the densest screens in the course and have never been visually checked on a real viewport:
+
+- [ ] Lesson 07 step 7 — building the rocket
+- [ ] Lesson 08 step 7 — the surrogate pair
+- [ ] Challenge steps 2, 5 and 6 — the pipeline tray, the three-byte build, and the three-way ledger

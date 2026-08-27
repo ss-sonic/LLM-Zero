@@ -8,6 +8,7 @@ import { CODE_POINTS_VS_BYTES_STEPS, CODE_POINTS_VS_BYTES_STORAGE_KEY } from "./
 import { HEXADECIMAL_BRIDGE_STEPS, HEXADECIMAL_BRIDGE_STORAGE_KEY } from "./06a-hexadecimal/config";
 import { UTF_8_STEPS, UTF_8_STORAGE_KEY } from "./07-utf-8/config";
 import { UTF_ENCODINGS_STEPS, UTF_ENCODINGS_STORAGE_KEY } from "./08-utf-encodings/config";
+import { CHALLENGE_STEPS, CHALLENGE_STORAGE_KEY } from "./09-text-pipeline-challenge/config";
 
 export const LESSONS: LessonMeta[] = [
   { number: 1, slug: "character-representation", title: "How computers represent text", question: "How can the letter A exist inside a computer?", description: "Build the bridge from a human-visible symbol to a number and then to bits.", module: "Text becomes data", status: "available", progress: { storageKey: CHARACTER_REPRESENTATION_STORAGE_KEY, stepCount: CHARACTER_REPRESENTATION_STEPS.length } },
@@ -19,7 +20,7 @@ export const LESSONS: LessonMeta[] = [
   { number: 6.5, displayNumber: "F1", slug: "hexadecimal", title: "Hexadecimal: shorthand for bits", question: "Why do programmers write F0 instead of 11110000?", description: "Derive hexadecimal from four-bit groups and learn to convert bytes between binary and compact hex notation without changing their value.", module: "Text becomes data", status: "available", progress: { storageKey: HEXADECIMAL_BRIDGE_STORAGE_KEY, stepCount: HEXADECIMAL_BRIDGE_STEPS.length } },
   { number: 7, slug: "utf-8", title: "Build UTF-8 by hand", question: "How does a Unicode code point become real bytes?", description: "Discover why variable-length bytes need to carry their own structure, derive UTF-8's tags from ASCII's unused bit, and build a character byte by byte.", module: "Text becomes data", status: "available", progress: { storageKey: UTF_8_STORAGE_KEY, stepCount: UTF_8_STEPS.length } },
   { number: 8, slug: "utf-encodings", title: "UTF-8 vs UTF-16 vs UTF-32", question: "Why is there more than one way to encode Unicode?", description: "Take the 1991 bet yourself, watch it lose, invent the patch that saved it, and discover that Unicode's ceiling is the size of that patch.", module: "Text becomes data", status: "available", progress: { storageKey: UTF_ENCODINGS_STORAGE_KEY, stepCount: UTF_ENCODINGS_STEPS.length } },
-  { number: 9, slug: "text-pipeline-challenge", title: "Challenge: trace a sentence to bytes", question: "Can you take a multilingual sentence all the way from symbols to bytes on your own?", description: "No new ideas — every step of the pipeline you have built, applied end to end without scaffolding.", module: "Text becomes data", status: "coming-soon" },
+  { number: 9, displayNumber: "C1", slug: "text-pipeline-challenge", title: "Challenge: trace a sentence to bytes", question: "Can you take a multilingual sentence all the way from symbols to bytes on your own?", description: "No new ideas — every step of the pipeline you have built, applied end to end without scaffolding.", module: "Text becomes data", status: "available", progress: { storageKey: CHALLENGE_STORAGE_KEY, stepCount: CHALLENGE_STEPS.length } },
 ];
 
 export function getLessonMeta(slug: string) { return LESSONS.find((lesson) => lesson.slug === slug); }

@@ -8,6 +8,7 @@ import { CODE_POINTS_VS_BYTES_REVIEW } from "./06-code-points-vs-bytes/config";
 import { HEXADECIMAL_BRIDGE_REVIEW } from "./06a-hexadecimal/config";
 import { UTF_8_REVIEW } from "./07-utf-8/config";
 import { UTF_ENCODINGS_REVIEW } from "./08-utf-encodings/config";
+import { CHALLENGE_REVIEW } from "./09-text-pipeline-challenge/config";
 
 export type { ReviewPrompt } from "./types";
 
@@ -27,6 +28,7 @@ export const REVIEW_PROMPTS: ReviewPrompt[] = [
   ...HEXADECIMAL_BRIDGE_REVIEW,
   ...UTF_8_REVIEW,
   ...UTF_ENCODINGS_REVIEW,
+  ...CHALLENGE_REVIEW,
 ];
 
 export const REVIEW_PROMPT_IDS = REVIEW_PROMPTS.map((prompt) => prompt.id);

@@ -40,13 +40,13 @@ export function CompleteStep({ onRestart }: { onRestart: () => void }) {
         <div><small>next</small><b>You have every piece of the path from a visible symbol to bytes. Can you trace one all the way through, without help?</b></div>
       </div>
 
-      <div className="next-lesson-card pending">
+      <div className="next-lesson-card">
         <div>
           <small>Next</small>
           <h3>Challenge — trace a multilingual sentence from symbols to bytes</h3>
           <p>No new ideas. Every step of the pipeline you have built, applied end to end to a sentence that uses all of it.</p>
         </div>
-        <span className="l8-pending-badge">Coming next</span>
+        <Link className="primary-button" href="/lessons/text-pipeline-challenge">Take the challenge →</Link>
       </div>
 
       <div className="l8-complete-actions">

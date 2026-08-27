@@ -9,6 +9,7 @@ import { CodePointsVsBytesLesson } from "../../../curriculum/06-code-points-vs-b
 import { HexadecimalBridge } from "../../../curriculum/06a-hexadecimal/lesson";
 import { Utf8Lesson } from "../../../curriculum/07-utf-8/lesson";
 import { UtfEncodingsLesson } from "../../../curriculum/08-utf-encodings/lesson";
+import { TextPipelineChallenge } from "../../../curriculum/09-text-pipeline-challenge/lesson";
 import { LESSONS, getLessonMeta } from "../../../curriculum/registry";
 
 export function generateStaticParams() { return LESSONS.filter((lesson) => lesson.status === "available").map((lesson) => ({ lessonSlug: lesson.slug })); }
@@ -28,6 +29,7 @@ export default async function LessonPage({ params }: { params: Promise<{ lessonS
     case "hexadecimal": return <HexadecimalBridge />;
     case "utf-8": return <Utf8Lesson />;
     case "utf-encodings": return <UtfEncodingsLesson />;
+    case "text-pipeline-challenge": return <TextPipelineChallenge />;
     default: notFound();
   }
 }

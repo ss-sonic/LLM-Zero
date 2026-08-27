@@ -258,7 +258,6 @@
 .l8-solved-open > div { border: 1px solid var(--line); border-radius: 16px; background: var(--card); padding: 16px; display: grid; gap: 7px; text-align: left; }
 .l8-solved-open small { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: 9px; font-weight: 800; }
 .l8-solved-open b { line-height: 1.45; }
-.l8-pending-badge { border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
 .l8-complete-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px; }
 
 @media (max-width: 900px) {
